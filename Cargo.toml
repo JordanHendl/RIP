@@ -1,0 +1,11 @@
+[package]
+name = "swspp"
+version = "0.1.0"
+edition = "2021"
+crate-type = ["cdylib"]
+
+[dependencies]
+#runa = {git = "https://github.com/JordanHendl/runa"}
+runa = {path = "../runa_lib"}
+lazy_static = "1.4.0"
+json = "0.12.4"

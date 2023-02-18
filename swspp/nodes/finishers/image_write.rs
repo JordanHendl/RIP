@@ -57,7 +57,7 @@ impl SwsppNode for ImageWrite {
     if self.data.view.is_some() {
       let view = self.data.view.as_ref().unwrap();
       let res = view.sync_get_pixels();
-
+      println!("Image Write writing out image...");
       match res {
         gpu::ImagePixels::ImageU8(img) => {
           let mut writer = ImageWriter::new(&self.data.path);
@@ -66,6 +66,7 @@ impl SwsppNode for ImageWrite {
         gpu::ImagePixels::ImageF32(img) => {
           let mut writer = ImageWriter::new(&self.data.path);
           let mut converted: Vec<u8> = Vec::with_capacity(img.len());
+          println!("Image Write received floating point image. Converting to u8 before writing!");
           for idx in 0..img.len() {
             converted[idx] = (img[idx] / std::u8::MAX as f32) as u8;
           }
@@ -73,7 +74,7 @@ impl SwsppNode for ImageWrite {
           writer.write_png(view.width() as i32, view.height() as i32, view.component_count() as i32, converted.as_ptr());
         },
       }
-      
+      println!("Image Write finished writing image!");
       self.data.view = Default::default();
     }
   }

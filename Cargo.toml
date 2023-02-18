@@ -8,6 +8,13 @@ crate-type = ["cdylib"]
 name = "swspp"
 path = "swspp/lib.rs"
 
+[[bin]]
+name = "swspp"
+path = "swspp/bin.rs"
+
+[profile.release]
+opt-level = 3
+
 [dependencies]
 runa = {path = "../runa_lib"}
 lazy_static = "1.4.0"

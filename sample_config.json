@@ -7,7 +7,7 @@
   "finishers": {
     "image_write": {
       "input": "image_load.output",
-      "path": "./target/test.png"
+      "path": "./xtest.png"
     }
   }
 }

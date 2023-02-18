@@ -4,8 +4,13 @@ version = "0.1.0"
 edition = "2021"
 crate-type = ["cdylib"]
 
+[lib]
+name = "swspp"
+path = "swspp/lib.rs"
+
 [dependencies]
-#runa = {git = "https://github.com/JordanHendl/runa"}
 runa = {path = "../runa_lib"}
 lazy_static = "1.4.0"
 json = "0.12.4"
+stb_image = "0.2.4"
+stb_image_write_rust = "1.16.1"

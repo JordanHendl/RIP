@@ -1,0 +1,22 @@
+{
+  "starters": {
+    "image_load": {
+      "path": "test_image.png"
+    }
+  },
+  "nodes": {
+    "agl": {
+      "input": "image_load.output",
+      "min_rad": 0.0,
+      "max_rad": 1.0,
+      "num_bins": 100
+    }
+  },
+  "finishers": {
+    "image_write": {
+      "input": "agl.output",
+      "path": "output_image.png"
+    }
+  }
+  
+}

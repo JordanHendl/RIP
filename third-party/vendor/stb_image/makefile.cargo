@@ -1,0 +1,38 @@
+ifneq ($(HOST),$(TARGET))
+
+CC ?= $(TARGET)-gcc
+AR ?= $(TARGET)-ar
+
+else
+
+CC ?= gcc
+AR ?= ar
+
+endif
+
+ifeq (windows,$(findstring windows,$(TARGET)))
+    OSTYPE=windows
+    # cargo sets `$(OUT_DIR)` as native windows path. msys requires cygpath.
+    OUT_DIR:=$(shell cygpath "$(OUT_DIR)")
+    # msys sets `CC=cc` but there's no `cc.exe`. so we change it here.
+    ifeq (cc,$(CC))
+        CC:=gcc
+    endif
+endif
+
+CFLAGS += -fPIC
+
+ifeq ($(DEBUG),true)
+  CFLAGS += -g
+else
+  CFLAGS += -O3
+endif
+
+.PHONY: all
+all: $(OUT_DIR)/libstb-image.a
+
+$(OUT_DIR)/stb_image.o: src/stb_image.c
+	$(CC) $< -o $@ -c $(CFLAGS)
+
+$(OUT_DIR)/libstb-image.a: $(OUT_DIR)/stb_image.o
+	$(AR) rcs $@ $^

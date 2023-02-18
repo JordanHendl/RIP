@@ -1,0 +1,13 @@
+{
+  "starters": {
+    "image_load": {
+      "path": "G:/My Drive/assets/images/mountain.jpg"
+    }
+  },
+  "finishers": {
+    "image_write": {
+      "input": "image_load.output",
+      "path": "./target/test.png"
+    }
+  }
+}

@@ -82,7 +82,6 @@ pub extern "C" fn swspp_pulse() {
 #[cfg(test)]
 mod tests {
     use super::*;
-
     #[test]
     fn it_works() {
       let raw_path = concat!(env!("CARGO_MANIFEST_DIR"), "/sample_config.json");

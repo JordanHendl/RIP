@@ -43,13 +43,19 @@ impl ImageLoad {
         let info = gpu::Image::builder()
         .gpu(devices[0].id)
         .size(img.width, img.height)
-        .format(gpu::ImageFormat::RGBA8)
+        .format(gpu::ImageFormat::RGBA32F)
         .mip_count(1)
         .layers(1)
         .build();
 
         let mut gimg = gpu::Image::new(&self.interface, &info);
-        gimg.upload(&img.data);
+        let mut cpy: Vec<f32> = Vec::with_capacity(img.data.len());
+        for px in &img.data {
+          let new_px = (*px as f32) / (std::u8::MAX as f32);
+          cpy.push(new_px);
+        }
+
+        gimg.upload(&cpy);
         self.data.image = gimg;
       },
 
@@ -89,7 +95,7 @@ impl ImageLoad {
 
 // Base class implementations
 impl SwsppNode for ImageLoad {
-  fn execute(& mut self, cmd: &gpu::CommandList) {
+  fn execute(& mut self, cmd: & mut gpu::CommandList) {
     println!("Executing Node {}", self.name);
   }
 

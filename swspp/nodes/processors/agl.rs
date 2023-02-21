@@ -18,7 +18,7 @@ pub struct AGL {
 }
 
 impl SwsppNode for AGL {
-  fn execute(& mut self, cmd: &gpu::CommandList) {
+  fn execute(& mut self, cmd: & mut gpu::CommandList) {
       
   }
   

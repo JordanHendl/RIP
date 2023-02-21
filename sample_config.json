@@ -1,13 +1,24 @@
 {
   "starters": {
     "image_load": {
-      "path": "G:/My Drive/assets/images/mountain.jpg"
+      "path": "${SRC_DIR}/data/tulips.png"
+    }
+  },
+  "imgproc": {
+    "intensify": {
+      "input": "image_load.output"
+    },
+    "inverse": {
+      "input": "intensify.output"
+    },
+    "blur": {
+      "input": "inverse.output"
     }
   },
   "finishers": {
     "image_write": {
-      "input": "image_load.output",
-      "path": "./xtest.png"
+      "input": "blur.output",
+      "path": "${SRC_DIR}/target/test.png"
     }
   }
 }

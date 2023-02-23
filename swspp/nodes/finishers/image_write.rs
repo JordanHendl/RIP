@@ -83,8 +83,7 @@ impl SwsppNode for ImageWrite {
     self.data.view = Some(image.clone());
   }
 
-  fn output(&self) -> gpu::ImageView {
-    panic!("This object is a finisher and should never be called to output something!");
+  fn assign(& mut self, view: &gpu::ImageView) {
   }
 
 

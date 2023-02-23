@@ -26,10 +26,10 @@ impl SwsppNode for AGL {
 
   }
 
-  fn output(&self) -> gpu::ImageView {
-    return Default::default();
+  fn assign(&mut self, view: &gpu::ImageView) {
+    todo!();
   }
-
+  
   fn name(&self) -> String {
     return "SomeType".to_string();
   }

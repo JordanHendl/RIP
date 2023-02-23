@@ -15,7 +15,7 @@ void main() {
   const ivec2 tex_coords = ivec2( gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
   vec4 color = imageLoad( input_tex, tex_coords );
 
-  // This is formula to calculate relative luminance.
+  // This is formula to calculate relative luminance. It converts RGB -> Photometric luminance
   // The coefficients are based on the CIE color matching functions and relevant standard chromaticities of RGB.
   // These coefficients are for for sRGB.
   // See https://en.wikipedia.org/wiki/Luma_(video)

@@ -166,7 +166,7 @@ fn configure_nodes(json: &JsonValue) {
 }
 
 pub fn parse_json(interface: &Rc<RefCell<gpu::GPUInterface>>, path: &str) -> 
-(Vec<Box<dyn SwsppNode + Send>>, Vec<u32>, HashMap<u32, Vec<u32>>) {
+(Vec<Box<dyn SwsppNode + Send>>, Vec<u32>, HashMap<u32, Vec<u32>>, (u32, u32)) {
 
   let starter_functors = get_starter_functors();
   let node_functors = get_functors();
@@ -178,6 +178,9 @@ pub fn parse_json(interface: &Rc<RefCell<gpu::GPUInterface>>, path: &str) ->
   let mut starter_ids: HashMap<String, usize> = HashMap::new();
   let mut node_ids: HashMap<String, usize> = HashMap::new();
   let mut finisher_ids: HashMap<String, usize> = HashMap::new();
+
+  let xdim = 1280;
+  let ydim = 1024;
 
   println!("Loaded json file: \n{}", json_data);
   let root = json::parse(json_data.as_str()).expect("Unable to parse JSON configuration!");
@@ -248,5 +251,5 @@ pub fn parse_json(interface: &Rc<RefCell<gpu::GPUInterface>>, path: &str) ->
     &finishers);
 
 
-  return (created_nodes, execution_order, connections);
+  return (created_nodes, execution_order, connections, (xdim, ydim));
 }

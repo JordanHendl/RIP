@@ -15,7 +15,7 @@ use runa::*;
 #[derive(Default)]
 struct DifferenceData {
   num_received_inputs: u32,
-  image: Option<gpu::Image>,
+  image: Option<gpu::ImageView>,
   pipeline: gpu::ComputePipeline,
   bind_group: gpu::BindGroup,
 }
@@ -71,22 +71,17 @@ impl SwsppNode for Difference {
   }
 
   fn input(& mut self, image: &gpu::ImageView) {
-    if self.data.image.is_none() {
-      self.data.image = Some(gpu::Image::from(image));
-      self.data.bind_group.bind_image("output_tex", &self.data.image.as_ref().unwrap());
-    }
-
     if self.data.num_received_inputs == 0 {
-      
       self.data.bind_group.bind_image_view("input_tex_0", image);
       self.data.num_received_inputs += 1;
-    } else {
+    } else if self.data.num_received_inputs == 1 {
       self.data.bind_group.bind_image_view("input_tex_1", image);
     }
   }
 
-  fn output(&self) -> gpu::ImageView {
-    return self.data.image.as_ref().unwrap().view();
+  fn assign(& mut self, view: &gpu::ImageView) {
+    self.data.image = Some(view.clone());
+    self.data.bind_group.bind_image_view("output_tex", &self.data.image.as_ref().unwrap());
   }
 
 

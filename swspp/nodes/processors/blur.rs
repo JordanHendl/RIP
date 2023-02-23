@@ -14,7 +14,7 @@ use runa::*;
 
 #[derive(Default)]
 struct BlurData {
-  image: Option<gpu::Image>,
+  image: Option<gpu::ImageView>,
   pipeline: gpu::ComputePipeline,
   bind_group: gpu::BindGroup,
 }
@@ -69,15 +69,12 @@ impl SwsppNode for Blur {
   }
 
   fn input(& mut self, image: &gpu::ImageView) {
-    if self.data.image.is_none() {
-      self.data.image = Some(gpu::Image::from(image));
-      self.data.bind_group.bind_image("output_tex", &self.data.image.as_ref().unwrap());
-    }
     self.data.bind_group.bind_image_view("input_tex", image);
   }
 
-  fn output(&self) -> gpu::ImageView {
-    return self.data.image.as_ref().unwrap().view();
+  fn assign(& mut self, view: &gpu::ImageView) {
+    self.data.image = Some(view.clone());
+    self.data.bind_group.bind_image_view("output_tex", &self.data.image.as_ref().unwrap());
   }
 
 

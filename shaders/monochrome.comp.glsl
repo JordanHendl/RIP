@@ -34,7 +34,6 @@ vec3 convert_i3(vec3 in_color) {
   return vec3(intensity);
 }
 
-
 void main() {
   const uint mode = config.mode;
 

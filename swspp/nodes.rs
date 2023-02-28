@@ -9,7 +9,6 @@ use super::common;
 mod finishers;
 mod starters;
 mod processors;
-
 mod node_parser;
 
 pub trait SwsppNode {
@@ -35,6 +34,7 @@ pub struct Pipeline {
   execution_order: Vec<u32>,
   edges: HashMap<u32, Vec<u32>>,
   cmds: Vec<gpu::CommandList>,
+  first: bool,
 }
 
 impl Pipeline {
@@ -91,6 +91,7 @@ impl Pipeline {
       execution_order: Default::default(),
       edges: Default::default(),
       cmds: Default::default(),
+      first: true,
     };
 
     let info = gpu::CommandListCreateInfo::builder()
@@ -108,6 +109,12 @@ impl Pipeline {
   }
 
   pub fn execute(& mut self) {
+    if self.first {
+      self.first = false;
+    } else {
+      self.cmds[0].synchronize();
+    }
+    
     self.cmds[0].submit();
 
     for node_id in &self.execution_order {

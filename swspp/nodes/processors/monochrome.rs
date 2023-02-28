@@ -16,12 +16,6 @@ struct MonochromeConfig {
   mode: u32,
 }
 
-impl Default for MonochromeConfig {
-  fn default() -> Self {
-      return MonochromeConfig { mode: 0 }
-  }
-}
-
 #[derive(Default)]
 struct MonochromeData {
   image: Option<gpu::ImageView>,
@@ -43,6 +37,12 @@ pub struct Monochrome {
 
 // Need send to send through threads safely
 unsafe impl Send for Monochrome {}
+
+impl Default for MonochromeConfig {
+  fn default() -> Self {
+      return MonochromeConfig { mode: 0 }
+  }
+}
 
 // Implementations specific to this node
 impl Monochrome {

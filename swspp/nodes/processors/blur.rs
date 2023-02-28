@@ -16,12 +16,6 @@ struct BlurConfig {
   radius: u32,
 }
 
-impl Default for BlurConfig {
-  fn default() -> Self {
-      return BlurConfig { radius: 5 }
-  }
-}
-
 #[derive(Default)]
 struct BlurData {
   image: Option<gpu::ImageView>,
@@ -43,6 +37,12 @@ pub struct Blur {
 
 // Need send to send through threads safely
 unsafe impl Send for Blur {}
+
+impl Default for BlurConfig {
+  fn default() -> Self {
+      return BlurConfig { radius: 5 }
+  }
+}
 
 // Implementations specific to this node
 impl Blur {

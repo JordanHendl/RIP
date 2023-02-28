@@ -6,12 +6,15 @@
   },
   "imgproc": {
     "monochrome": {
-      "mode": "i3",
+      "mode": "cie_luma",
       "input": "image_load.output"
     },
-    "blur": {
-      "radius": 2,
+    "tonemap": {
       "input": "monochrome.output"
+    },
+    "blur": {
+      "radius": 5,
+      "input": "tonemap.output"
     }
   },
   "finishers": {

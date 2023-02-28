@@ -8,6 +8,8 @@ use common::*;
 mod nodes;
 use nodes::*;
 
+mod gpgpu;
+use gpgpu::*;
 #[repr(C)]
 pub struct RawImageInput {
   image: * const u8,

@@ -54,9 +54,11 @@ impl ImageWrite {
 impl SwsppNode for ImageWrite {
   fn execute(& mut self, cmd: & mut gpu::CommandList) {
     println!("Executing Node {}", self.name);
-    cmd.end();
-    cmd.submit_and_synchronize();
-    cmd.begin();
+  }
+  
+  fn post_execute(& mut self, cmd: & mut gpu::CommandList) {
+    // Need to synchronize to write out to disk.
+    cmd.synchronize();
     if self.data.view.is_some() {
       let view = self.data.view.as_ref().unwrap();
       let res = view.sync_get_pixels();
@@ -75,10 +77,9 @@ impl SwsppNode for ImageWrite {
           writer.write_png(view.width() as i32, view.height() as i32, view.component_count() as i32, converted.as_ptr());
         },
       }
-      self.data.view = Default::default();
     }
   }
-  
+
   fn input(& mut self, image: &gpu::ImageView) {
     self.data.view = Some(image.clone());
   }

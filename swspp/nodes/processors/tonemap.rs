@@ -13,15 +13,15 @@ use runa::*;
 ///////////////////////////////////////////////////
 
 #[derive(Default)]
-struct IntensifyData {
+struct TonemapData {
   image: Option<gpu::ImageView>,
   pipeline: gpu::ComputePipeline,
   bind_group: gpu::BindGroup,
 }
 
-pub struct Intensify {
+pub struct Tonemap {
   interface: Rc<RefCell<gpu::GPUInterface>>,
-  data: IntensifyData,
+  data: TonemapData,
   data_bus: crate::common::DataBus,
   name: String,
 }
@@ -31,13 +31,13 @@ pub struct Intensify {
 ///////////////////////////////////////////////////
 
 // Need send to send through threads safely
-unsafe impl Send for Intensify {}
+unsafe impl Send for Tonemap {}
 
 // Implementations specific to this node
-impl Intensify {
+impl Tonemap {
   pub fn new(info: &NodeCreateInfo) -> Box<dyn SwsppNode + Send> {
-    println!("Creating node {} as an Intensify node!", info.name);
-    let mut obj = Box::new(Intensify {
+    println!("Creating node {} as an Tonemap node!", info.name);
+    let mut obj = Box::new(Tonemap {
       interface: info.interface.clone(),
       data: Default::default(),
       data_bus: Default::default(),
@@ -59,7 +59,7 @@ impl Intensify {
 }
 
 // Base class implementations
-impl SwsppNode for Intensify {
+impl SwsppNode for Tonemap {
   fn execute(& mut self, cmd: & mut gpu::CommandList) {
     println!("Executing Node {}", self.name);
     let (x, y, z) = self.data.image.as_ref().unwrap().get_compute_groups(32, 32, 1);
@@ -83,6 +83,6 @@ impl SwsppNode for Intensify {
   }
 
   fn node_type(&self) -> String {
-    return "Intensify".to_string();
+    return "Tonemap".to_string();
   }
 }

@@ -1,6 +1,6 @@
 use super::*;
-pub mod agl;
-pub use agl::*;
+pub mod tonemap;
+pub use tonemap::*;
 
 pub mod intensify;
 pub use intensify::*;

@@ -16,9 +16,8 @@
     }
   },
   "finishers": {
-    "image_write": {
-      "input": "blur.output",
-      "path": "${SRC_DIR}/target/test.png"
+    "display": {
+      "input": "blur.output"
     }
   }
 }

@@ -66,8 +66,6 @@ impl SwsppNode for Inverse {
     cmd.bind_compute(&self.data.pipeline);
     cmd.bind(&self.data.bind_group);
     cmd.dispatch(x, y, z);
-
-    self.data.image = None;
   }
 
   fn input(& mut self, image: &gpu::ImageView) {

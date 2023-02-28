@@ -25,12 +25,13 @@ fn get_starter_functors() -> HashMap<String, Callback> {
 fn get_finisher_functors() -> HashMap<String, Callback> {
   let mut functors: HashMap<String, Callback> = Default::default();
   functors.insert("image_write".to_string(), finishers::ImageWrite::new);
+  functors.insert("display".to_string(), finishers::Display::new);
   return functors;
 } 
 
 fn get_functors() -> HashMap<String, Callback> {
   let mut functors: HashMap<String, Callback> = Default::default();
-  functors.insert("agl".to_string(), processors::AGL::new);
+  functors.insert("tonemap".to_string(), processors::Tonemap::new);
   functors.insert("intensify".to_string(), processors::Intensify::new);
   functors.insert("inverse".to_string(), processors::Inverse::new);
   functors.insert("blur".to_string(), processors::Blur::new);
@@ -38,7 +39,7 @@ fn get_functors() -> HashMap<String, Callback> {
 }
 
 fn find_connections(starter_ids: &HashMap<String, usize>, node_ids: &HashMap<String, usize>, finisher_ids: &HashMap<String, usize>,
-  starters: &JsonValue, nodes: &JsonValue, finishers: &JsonValue) -> (HashMap<u32, Vec<u32>>, Vec<u32>) {
+  _starters: &JsonValue, nodes: &JsonValue, finishers: &JsonValue) -> (HashMap<u32, Vec<u32>>, Vec<u32>) {
   // Now to find execution order
   let mut execution_order: Vec<u32> = Vec::new();
   let mut inserted_nodes: HashSet<String> = HashSet::new();

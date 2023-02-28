@@ -18,6 +18,7 @@ pub trait SwsppNode {
   fn assign(& mut self, view: &gpu::ImageView);
   fn input(& mut self, image: &gpu::ImageView); 
   fn execute(& mut self, cmd: & mut gpu::CommandList);
+  fn post_execute(& mut self, _cmd: & mut gpu::CommandList) {}
 }
 
 // Information needed for any node to create itself.
@@ -33,6 +34,7 @@ pub struct Pipeline {
   nodes: Vec<Box<dyn SwsppNode + Send>>,
   execution_order: Vec<u32>,
   edges: HashMap<u32, Vec<u32>>,
+  cmds: Vec<gpu::CommandList>,
 }
 
 impl Pipeline {
@@ -60,26 +62,7 @@ impl Pipeline {
     self.execution_order = execution;
     self.edges = edges;
 
-
-  }
-
-  pub fn new() -> Self {
-    let pipeline = Pipeline { 
-      interface: gpu::GPUInterface::new(),
-      images: Default::default(),
-      views: Default::default(),
-      nodes: Default::default(), 
-      execution_order: Default::default(),
-      edges: Default::default(),
-    };
-
-    return pipeline;
-  }
-
-  pub fn execute(& mut self) {
-    let mut frame = self.interface.borrow_mut().begin_frame(0);
-    let mut cmd = frame.command_list();
-    cmd.begin();
+    self.cmds[0].begin();
     for node_id in &self.execution_order {
       self.nodes[*node_id as usize].assign(&self.views[*node_id as usize]);
       // Send image if we have nodes who depend on it. Finishers should never get here.
@@ -90,13 +73,45 @@ impl Pipeline {
           self.nodes[*node_id as usize].input(view);
         }
       }
-
       // Execute
       let node = & mut self.nodes[*node_id as usize];
-      node.execute(& mut cmd);
+      node.execute(& mut self.cmds[0]);
+    }
+    self.cmds[0].end();
+  }
+
+  pub fn new() -> Self {
+    let num_layers = 1;
+
+    let mut pipeline = Pipeline { 
+      interface: gpu::GPUInterface::new(),
+      images: Default::default(),
+      views: Default::default(),
+      nodes: Default::default(), 
+      execution_order: Default::default(),
+      edges: Default::default(),
+      cmds: Default::default(),
+    };
+
+    let info = gpu::CommandListCreateInfo::builder()
+    .gpu(0)
+    .queue_type(gpu::QueueType::Graphics)
+    .build();
+
+    let mut cmds: Vec<gpu::CommandList> = Vec::new();
+    for _i in 0..num_layers {
+      cmds.push(gpu::CommandList::new(&pipeline.interface, &info));
     }
 
-    cmd.end();
-    frame.end_and_wait();
+    pipeline.cmds = cmds;
+    return pipeline;
+  }
+
+  pub fn execute(& mut self) {
+    self.cmds[0].submit();
+
+    for node_id in &self.execution_order {
+      self.nodes[*node_id as usize].post_execute(& mut self.cmds[0]);
+    }
   }
 }

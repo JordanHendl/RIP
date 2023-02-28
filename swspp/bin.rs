@@ -8,5 +8,19 @@ fn main() {
   let path = CString::new(path).unwrap();
   let c_string = path.as_c_str().as_ptr();
   let _id = swspp_create_pipeline(c_string);
-  swspp_pulse();
+
+
+  let args = std::env::args().nth(2);
+  if args.is_some() {
+    let str = args.unwrap().clone();
+    if str.eq(&"--repeat".to_string()) {
+      loop {
+        swspp_pulse();
+      }
+    } else {
+      swspp_pulse();  
+    }
+  } else {
+    swspp_pulse();
+  }
 }

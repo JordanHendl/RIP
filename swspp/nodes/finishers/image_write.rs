@@ -52,7 +52,7 @@ impl ImageWrite {
 }
 
 impl SwsppNode for ImageWrite {
-  fn execute(& mut self, cmd: & mut gpu::CommandList) {
+  fn execute(& mut self, _cmd: & mut gpu::CommandList) {
     println!("Executing Node {}", self.name);
   }
   
@@ -84,7 +84,7 @@ impl SwsppNode for ImageWrite {
     self.data.view = Some(image.clone());
   }
 
-  fn assign(& mut self, view: &gpu::ImageView) {
+  fn assign(& mut self, _view: &gpu::ImageView) {
   }
 
 

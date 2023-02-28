@@ -30,7 +30,7 @@ vec3 convert_normalized(vec3 in_color) {
 }
 
 vec3 convert_i3(vec3 in_color) {
-  const float intensity = ((2.0 * in_color.g) - in_color.b - in_color.r) / 2.0;
+  const float intensity = (((2.0 * in_color.g) - in_color.b - in_color.r) / 4.0);
   return vec3(intensity);
 }
 
@@ -38,7 +38,7 @@ void main() {
   const uint mode = config.mode;
 
   const ivec2 tex_coords = ivec2( gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
-  vec4 color = imageLoad( input_tex, tex_coords );
+  vec4 color = imageLoad(input_tex, tex_coords);
   vec3 out_color;
 
   switch(mode) {

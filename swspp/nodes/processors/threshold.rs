@@ -41,12 +41,20 @@ unsafe impl Send for Threshold {}
 
 impl Default for ThresholdConfig {
   fn default() -> Self {
-      return ThresholdConfig { mode: 0, radius: 8}
+      return ThresholdConfig { mode: 0, radius: 4}
   }
 }
 
 // Implementations specific to this node
 impl Threshold {
+  pub fn set_radius(& mut self, input: &u32) {
+    println!("Setting radius {} for node {}", input, self.name);
+
+    let mapped = unsafe{self.data.config.as_mut().unwrap().map()};
+    mapped[0].radius = *input;
+    unsafe{self.data.config.as_mut().unwrap().unmap()};
+  }
+
   pub fn set_mode(& mut self, input: &String) {
     println!("Setting mode {} for node {}", input, self.name);
     let mut mode = 0;
@@ -90,7 +98,8 @@ impl Threshold {
 
     let mut bus: DataBus = Default::default();
     let name = info.name.clone();
-    bus.add_object_subscriber(&(name + "::mode"), obj.as_mut(), Threshold::set_mode);
+    bus.add_object_subscriber(&(name.clone() + "::mode"), obj.as_mut(), Threshold::set_mode);
+    bus.add_object_subscriber(&(name.clone() + "::radius"), obj.as_mut(), Threshold::set_radius);
     obj.data_bus = bus;
 
 

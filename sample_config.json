@@ -1,19 +1,20 @@
 {
   "starters": {
     "image_load": {
-      "path": "${SRC_DIR}/data/tulips.png"
+      "path": "${SRC_DIR}/data/test.png"
     }
   },
   "imgproc": {
     "monochrome": {
-      "mode": "cie_luma",
+      "mode": "intensity",
       "input": "image_load.output"
     },
     "blur": {
-      "radius": 8,
+      "radius": 4,
       "input": "monochrome.output"
     },
     "threshold": {
+      "radius": 16,
       "input": "blur.output"
     }
   },

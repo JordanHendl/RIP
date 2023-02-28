@@ -2,8 +2,8 @@ use super::*;
 pub mod tonemap;
 pub use tonemap::*;
 
-pub mod intensify;
-pub use intensify::*;
+pub mod monochrome;
+pub use monochrome::*;
 
 pub mod inverse;
 pub use inverse::*;

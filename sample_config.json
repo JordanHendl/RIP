@@ -5,14 +5,13 @@
     }
   },
   "imgproc": {
-    "intensify": {
+    "monochrome": {
+      "mode": "i3",
       "input": "image_load.output"
     },
-    "inverse": {
-      "input": "intensify.output"
-    },
     "blur": {
-      "input": "inverse.output"
+      "radius": 2,
+      "input": "monochrome.output"
     }
   },
   "finishers": {

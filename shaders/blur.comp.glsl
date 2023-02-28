@@ -11,9 +11,13 @@ layout(local_size_x = BLOCK_SIZE_X, local_size_y = BLOCK_SIZE_Y, local_size_z = 
 layout(binding = 0, rgba32f) coherent restrict readonly  uniform image2D input_tex;
 layout(binding = 1, rgba32f) coherent restrict writeonly uniform image2D output_tex;
 
+layout(binding = 2) uniform BlurConfig {
+  uint radius;
+} config;
 
 void main() {
-  const int radius = 3;
+  const int radius = int(config.radius);
+
   const ivec2 center = ivec2( gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
   int xcenter = int(gl_GlobalInvocationID.x);
   int ycenter = int(gl_GlobalInvocationID.y);

@@ -4,8 +4,6 @@ use super::common::*;
 use std::cell::RefCell;
 use runa::*;
 
-
-
 struct HistogramData {
   num_bins: u32,
   min_radiosity: f32,

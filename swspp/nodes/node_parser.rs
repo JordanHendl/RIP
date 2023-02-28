@@ -32,7 +32,7 @@ fn get_finisher_functors() -> HashMap<String, Callback> {
 fn get_functors() -> HashMap<String, Callback> {
   let mut functors: HashMap<String, Callback> = Default::default();
   functors.insert("tonemap".to_string(), processors::Tonemap::new);
-  functors.insert("intensify".to_string(), processors::Intensify::new);
+  functors.insert("monochrome".to_string(), processors::Monochrome::new);
   functors.insert("inverse".to_string(), processors::Inverse::new);
   functors.insert("blur".to_string(), processors::Blur::new);
   return functors;
@@ -149,6 +149,7 @@ fn configure_nodes(json: &JsonValue) {
     for config in node.1.entries() {
       if config.0.ne("type") {
         let key = node.0.to_string() + &"::".to_string() + config.0;
+        println!("Parsing configuration option {}", key);
         if config.1.is_boolean() {
           data_bus.send(&key, &config.1.as_bool().unwrap());
         } else if config.1.is_string() {
@@ -158,8 +159,11 @@ fn configure_nodes(json: &JsonValue) {
             value = value.replace(string.0, string.1);
           }
           
-          println!("Sending configuration {} for {}", value, &key);
+          
           data_bus.send(&key, &value);
+        } else if config.1.is_number() {
+          data_bus.send(&key, config.1.as_u32().as_ref().unwrap());
+          data_bus.send(&key, config.1.as_f32().as_ref().unwrap());
         }
       }
     }

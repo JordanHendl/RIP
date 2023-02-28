@@ -12,16 +12,27 @@ use runa::*;
 /// Structure declarations
 ///////////////////////////////////////////////////
 
+struct MonochromeConfig {
+  mode: u32,
+}
+
+impl Default for MonochromeConfig {
+  fn default() -> Self {
+      return MonochromeConfig { mode: 0 }
+  }
+}
+
 #[derive(Default)]
-struct IntensifyData {
+struct MonochromeData {
   image: Option<gpu::ImageView>,
+  config: Option<gpu::Vector<MonochromeConfig>>,
   pipeline: gpu::ComputePipeline,
   bind_group: gpu::BindGroup,
 }
 
-pub struct Intensify {
+pub struct Monochrome {
   interface: Rc<RefCell<gpu::GPUInterface>>,
-  data: IntensifyData,
+  data: MonochromeData,
   data_bus: crate::common::DataBus,
   name: String,
 }
@@ -31,35 +42,65 @@ pub struct Intensify {
 ///////////////////////////////////////////////////
 
 // Need send to send through threads safely
-unsafe impl Send for Intensify {}
+unsafe impl Send for Monochrome {}
 
 // Implementations specific to this node
-impl Intensify {
+impl Monochrome {
+  pub fn set_mode(& mut self, input: &String) {
+    println!("Setting mode {} for node {}", input, self.name);
+    let mut mode = 0;
+    match input.as_str() {
+      "cie_luma" => mode = 0,
+      "intensity" => mode = 1,
+      "i3" => mode = 2,
+      _ => {},
+    }
+
+    let default_config: MonochromeConfig = MonochromeConfig { mode: mode };
+    self.data.config.as_mut().unwrap().upload(std::slice::from_ref(&default_config));
+  }
+
   pub fn new(info: &NodeCreateInfo) -> Box<dyn SwsppNode + Send> {
-    println!("Creating node {} as an Intensify node!", info.name);
-    let mut obj = Box::new(Intensify {
+    let mut obj = Box::new(Monochrome {
       interface: info.interface.clone(),
       data: Default::default(),
       data_bus: Default::default(),
       name: info.name.to_string(),
     });
 
-    let raw_shader = common::to_u32_slice(include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/target/shaders/intensify.spirv")).as_ref());
+    let raw_shader = common::to_u32_slice(include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/target/shaders/monochrome.spirv")).as_ref());
     let info = gpu::ComputePipelineCreateInfo::builder()
     .gpu(0)
     .shader(raw_shader)
     .name(&info.name)
     .build();
 
+    let buff_info = gpu::BufferCreateInfo::builder()
+    .gpu(0)
+    .size(1)
+    .build();
+
     let pipeline = gpu::ComputePipeline::new(&obj.interface, &info);
     obj.data.bind_group = pipeline.bind_group();
     obj.data.pipeline = pipeline;
+
+    let default_config: MonochromeConfig = Default::default();
+    obj.data.config = Some(gpu::Vector::new(&obj.interface, &buff_info));
+    obj.data.config.as_mut().unwrap().upload(std::slice::from_ref(&default_config));
+
+    let mut bus: DataBus = Default::default();
+    let name = info.name.clone();
+    bus.add_object_subscriber(&(name + "::mode"), obj.as_mut(), Monochrome::set_mode);
+    obj.data_bus = bus;
+
+
+    obj.data.bind_group.bind_vector("config", obj.data.config.as_ref().unwrap());
     return obj;
   }
 }
 
 // Base class implementations
-impl SwsppNode for Intensify {
+impl SwsppNode for Monochrome {
   fn execute(& mut self, cmd: & mut gpu::CommandList) {
     println!("Executing Node {}", self.name);
     let (x, y, z) = self.data.image.as_ref().unwrap().get_compute_groups(32, 32, 1);
@@ -83,6 +124,6 @@ impl SwsppNode for Intensify {
   }
 
   fn node_type(&self) -> String {
-    return "Intensify".to_string();
+    return "monochrome".to_string();
   }
 }

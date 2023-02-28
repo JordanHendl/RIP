@@ -1,7 +1,7 @@
 {
   "starters": {
     "image_load": {
-      "path": "${SRC_DIR}/data/tulips.png"
+      "path": "${SRC_DIR}/data/cat.jpeg"
     }
   },
   "imgproc": {

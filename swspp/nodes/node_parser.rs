@@ -185,8 +185,7 @@ pub fn parse_json(interface: &Rc<RefCell<gpu::GPUInterface>>, path: &str) ->
   let mut node_ids: HashMap<String, usize> = HashMap::new();
   let mut finisher_ids: HashMap<String, usize> = HashMap::new();
 
-  let xdim = 1280;
-  let ydim = 1024;
+
 
   println!("Loaded json file: \n{}", json_data);
   let root = json::parse(json_data.as_str()).expect("Unable to parse JSON configuration!");
@@ -197,6 +196,15 @@ pub fn parse_json(interface: &Rc<RefCell<gpu::GPUInterface>>, path: &str) ->
   let nodes = &root["imgproc"];
   let finishers = &root["finishers"];
   
+  let mut xdim = 1280;
+  let mut ydim = 1024;
+  if root.has_key("dimensions") {
+    let dims = &root["dimensions"];
+    assert!(dims.is_array());
+    xdim = dims[0].as_u32().unwrap();
+    ydim = dims[1].as_u32().unwrap();
+  }
+
   let node_handler = |node: (&str, &JsonValue), functors: &HashMap<String, Callback>| {
     let name = node.0;
     let type_name = if node.1.has_key("type") {node.1["type"].as_str()} else {Some(node.0)}.unwrap();

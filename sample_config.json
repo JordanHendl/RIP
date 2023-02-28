@@ -9,17 +9,17 @@
       "mode": "cie_luma",
       "input": "image_load.output"
     },
-    "tonemap": {
+    "blur": {
+      "radius": 8,
       "input": "monochrome.output"
     },
-    "blur": {
-      "radius": 5,
-      "input": "tonemap.output"
+    "threshold": {
+      "input": "blur.output"
     }
   },
   "finishers": {
     "display": {
-      "input": "blur.output"
+      "input": "threshold.output"
     }
   }
 }

@@ -13,3 +13,6 @@ pub use blur::*;
 
 pub mod difference;
 pub use difference::*;
+
+pub mod threshold;
+pub use threshold::*;

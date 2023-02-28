@@ -34,6 +34,7 @@ fn get_functors() -> HashMap<String, Callback> {
   functors.insert("tonemap".to_string(), processors::Tonemap::new);
   functors.insert("monochrome".to_string(), processors::Monochrome::new);
   functors.insert("inverse".to_string(), processors::Inverse::new);
+  functors.insert("threshold".to_string(), processors::Threshold::new);
   functors.insert("blur".to_string(), processors::Blur::new);
   return functors;
 }

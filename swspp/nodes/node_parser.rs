@@ -35,7 +35,9 @@ fn get_functors() -> HashMap<String, Callback> {
   functors.insert("monochrome".to_string(), processors::Monochrome::new);
   functors.insert("inverse".to_string(), processors::Inverse::new);
   functors.insert("threshold".to_string(), processors::Threshold::new);
+  functors.insert("adaptive_threshold".to_string(), processors::AdaptiveThreshold::new);
   functors.insert("blur".to_string(), processors::Blur::new);
+  functors.insert("connected_components".to_string(), processors::ConnectedComponents::new);
   return functors;
 }
 
@@ -163,8 +165,13 @@ fn configure_nodes(json: &JsonValue) {
           
           data_bus.send(&key, &value);
         } else if config.1.is_number() {
-          data_bus.send(&key, config.1.as_u32().as_ref().unwrap());
-          data_bus.send(&key, config.1.as_f32().as_ref().unwrap());
+          if config.1.as_u32().as_ref().is_some() {
+            data_bus.send(&key, config.1.as_u32().as_ref().unwrap());
+          }
+
+          if config.1.as_f32().as_ref().is_some() {
+            data_bus.send(&key, config.1.as_f32().as_ref().unwrap());
+          }
         }
       }
     }

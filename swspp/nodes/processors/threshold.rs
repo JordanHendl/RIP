@@ -13,8 +13,8 @@ use runa::*;
 ///////////////////////////////////////////////////
 
 struct ThresholdConfig {
-  radius: u32,
   mode: u32,
+  constant: f32,
 }
 
 #[derive(Default)]
@@ -41,17 +41,16 @@ unsafe impl Send for Threshold {}
 
 impl Default for ThresholdConfig {
   fn default() -> Self {
-      return ThresholdConfig { mode: 0, radius: 4}
+      return ThresholdConfig { mode: 0, constant: 0.5}
   }
 }
 
 // Implementations specific to this node
 impl Threshold {
-  pub fn set_radius(& mut self, input: &u32) {
-    println!("Setting radius {} for node {}", input, self.name);
-
+  pub fn set_constant(& mut self, constant: &f32) {
+    println!("Setting constant value {} for node {}", constant, self.name);
     let mapped = unsafe{self.data.config.as_mut().unwrap().map()};
-    mapped[0].radius = *input;
+    mapped[0].constant = *constant;
     unsafe{self.data.config.as_mut().unwrap().unmap()};
   }
 
@@ -59,7 +58,7 @@ impl Threshold {
     println!("Setting mode {} for node {}", input, self.name);
     let mut mode = 0;
     match input.as_str() {
-      "stddev" => mode = 0,
+      "constant" => mode = 0,
       _ => {},
     }
 
@@ -99,7 +98,7 @@ impl Threshold {
     let mut bus: DataBus = Default::default();
     let name = info.name.clone();
     bus.add_object_subscriber(&(name.clone() + "::mode"), obj.as_mut(), Threshold::set_mode);
-    bus.add_object_subscriber(&(name.clone() + "::radius"), obj.as_mut(), Threshold::set_radius);
+    bus.add_object_subscriber(&(name.clone() + "::constant"), obj.as_mut(), Threshold::set_constant);
     obj.data_bus = bus;
 
 
@@ -116,6 +115,7 @@ impl SwsppNode for Threshold {
     cmd.bind_compute(&self.data.pipeline);
     cmd.bind(&self.data.bind_group);
     cmd.dispatch(x, y, z);
+    cmd.image_write_barrier(self.data.image.as_ref().unwrap());
   }
 
   fn input(& mut self, image: &gpu::ImageView) {

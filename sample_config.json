@@ -1,27 +1,18 @@
 {
-  "dimensions": [1280, 1024],
+  "dimensions": [512, 1024],
   "starters": {
     "image_load": {
-      "path": "${SRC_DIR}/data/test.png"
+      "path": "${SRC_DIR}/data/cat.jpeg"
     }
   },
   "imgproc": {
-    "monochrome": {
-      "mode": "intensity",
+    "tonemap": {
       "input": "image_load.output"
-    },
-    "blur": {
-      "radius": 4,
-      "input": "monochrome.output"
-    },
-    "threshold": {
-      "radius": 4,
-      "input": "blur.output"
     }
   },
   "finishers": {
     "display": {
-      "input": "threshold.output"
+      "input": "tonemap.output"
     }
   }
 }

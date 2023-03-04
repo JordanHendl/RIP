@@ -67,6 +67,7 @@ impl SwsppNode for Difference {
     cmd.bind_compute(&self.data.pipeline);
     cmd.bind(&self.data.bind_group);
     cmd.dispatch(x, y, z);
+    cmd.image_write_barrier(self.data.image.as_ref().unwrap());
     self.data.num_received_inputs = 0;
   }
 

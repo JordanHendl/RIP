@@ -13,12 +13,13 @@ pub struct HistogramConfig {
 
 impl Default for HistogramConfig {
   fn default() -> Self {
-      return HistogramConfig { num_bins: 128, min_rad: 0.0, max_rad: 1.0 }
+      return HistogramConfig { num_bins: 64, min_rad: 0.0, max_rad: 1.0 }
   }
 }
 
 #[derive(Default)]
 struct HistogramData {
+  calculated: bool,
   histogram: gpu::Vector<u32>,
   config: gpu::Vector<HistogramConfig>,
   clear_hist: gpu::ComputePipeline,
@@ -80,6 +81,7 @@ impl Histogram {
       config: cfg,
       clear_bg: bg1,
       calculate_bg: bg2,
+      calculated: false,
     };
 
     let hist = Histogram {
@@ -90,8 +92,8 @@ impl Histogram {
   }
 
   pub fn calculate(& mut self, img: &gpu::ImageView, cmd: &gpu::CommandList) {
+    self.data.calculated = true;
     self.data.calculate_bg.bind_image_view("input_tex", &img);
-
     let x = self.data.histogram.get_compute_groups(32);
     cmd.bind_compute(&self.data.clear_hist);
     cmd.bind(&self.data.clear_bg);
@@ -109,5 +111,34 @@ impl Histogram {
   
   pub fn histogram(&self) -> &gpu::Vector<u32> {
     return &self.data.histogram;
+  }
+
+  pub fn set_num_bins(& mut self, num_bins: u32) {
+    if !self.data.calculated {
+      let mut buff_info = gpu::BufferCreateInfo::builder()
+      .gpu(0)
+      .size(num_bins as usize)
+      .build();
+      let data: gpu::Vector<u32> = gpu::Vector::new(&self.interface, &buff_info);
+      self.data.clear_bg.bind_vector("data", &data);
+      self.data.calculate_bg.bind_vector("data", &data);
+      self.data.histogram = data;
+      
+      let mapped = unsafe{self.data.config.map()};
+      mapped[0].num_bins = num_bins;
+      unsafe{self.data.config.unmap()};
+    }
+  }
+
+  pub fn set_max_rad(& mut self, max_rad: f32) {
+    let mapped = unsafe{self.data.config.map()};
+    mapped[0].max_rad = max_rad;
+    unsafe{self.data.config.unmap()};
+  }
+
+  pub fn set_min_rad(& mut self, min_rad: f32) {
+    let mapped = unsafe{self.data.config.map()};
+    mapped[0].min_rad = min_rad;
+    unsafe{self.data.config.unmap()};
   }
 }

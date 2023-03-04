@@ -29,6 +29,7 @@ pub struct NodeCreateInfo {
 }
 
 pub struct Pipeline {
+  register: gpu::EventSubscriber,
   images: Vec<gpu::Image>,
   views: Vec<gpu::ImageView>,
   interface: Rc<RefCell<gpu::GPUInterface>>,
@@ -37,6 +38,7 @@ pub struct Pipeline {
   edges: HashMap<u32, Vec<u32>>,
   cmds: Vec<gpu::CommandList>,
   first: bool,
+  should_run: Rc<RefCell<bool>>,
 }
 
 impl Pipeline {
@@ -94,6 +96,8 @@ impl Pipeline {
       edges: Default::default(),
       cmds: Default::default(),
       first: true,
+      should_run: Rc::new(RefCell::new(true)),
+      register: Default::default(),
     };
 
     let info = gpu::CommandListCreateInfo::builder()
@@ -106,13 +110,30 @@ impl Pipeline {
       cmds.push(gpu::CommandList::new(&pipeline.interface, &info));
     }
 
+    pipeline.register = gpu::EventSubscriber::new(&pipeline.interface);
+
     pipeline.cmds = cmds;
     return pipeline;
+  }
+
+  pub fn should_run(&self) -> bool {
+    return *self.should_run.as_ref().borrow();
   }
 
   pub fn execute(& mut self) {
     if self.first {
       self.first = false;
+      let s = self.should_run.clone();
+      let cb = Box::new(move |event: &sdl2::event::Event| { 
+        if event.is_window() {
+          match event {
+            sdl2::event::Event::Quit { .. } => *s.borrow_mut() = false,
+            _ => {},
+          }
+        }
+      });
+      
+      self.register.add_callback("SWSPP Quit Callback", cb);
     } else {
       self.cmds[0].synchronize();
     }
@@ -122,5 +143,7 @@ impl Pipeline {
     for node_id in &self.execution_order {
       self.nodes[*node_id as usize].post_execute(& mut self.cmds[0]);
     }
+
+    self.interface.as_ref().borrow_mut().poll_events();
   }
 }

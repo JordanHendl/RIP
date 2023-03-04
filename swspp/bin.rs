@@ -14,7 +14,7 @@ fn main() {
   if args.is_some() {
     let str = args.unwrap().clone();
     if str.eq(&"--repeat".to_string()) {
-      loop {
+      while swspp_should_run() {
         swspp_pulse();
       }
     } else {

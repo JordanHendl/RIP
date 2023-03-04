@@ -24,7 +24,9 @@ protobuf-codegen = "3"
 [dependencies]
 zmq = "0.10.0"
 protobuf = "3.2.0"
-runa = {git = "https://github.com/JordanHendl/runa"}
+#runa = {git = "https://github.com/JordanHendl/runa"}
+sdl2 = { git = "https://github.com/Rust-SDL2/rust-sdl2", features = ["bundled"] }
+runa = {path = "../runa_lib"}
 lazy_static = "1.4.0"
 json = "0.12.4"
 stb_image = "0.2.4"

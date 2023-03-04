@@ -83,8 +83,6 @@ impl SwsppNode for Display {
     self.data.window.as_mut().unwrap().combo_next_action_into(&cmd);
     self.data.window.as_ref().unwrap().acquire();
     cmd.combo_next_action_into_window(self.data.window.as_ref().unwrap());
-
-    self.interface.as_ref().borrow().poll_events();
   }
 
   fn input(& mut self, image: &gpu::ImageView) {

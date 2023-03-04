@@ -56,6 +56,15 @@ lazy_static! {
   static ref SWSPP_DATA: std::sync::Mutex<SwsppData> = Default::default();
 }
 
+#[no_mangle]
+pub extern "C" fn swspp_should_run() -> bool {
+  let mut data = SWSPP_DATA.lock().expect("Unable to lock SWSPP static data!");
+  for pipeline in & mut data.pipelines {
+    if pipeline.1.should_run() == false {return false;};
+  }
+
+  return true;
+}
 
 #[no_mangle]
 pub extern "C" fn swspp_create_pipeline(config: *const i8) -> u32 {

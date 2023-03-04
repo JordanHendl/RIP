@@ -10,6 +10,9 @@ use nodes::*;
 
 mod gpgpu;
 use gpgpu::*;
+
+mod network;
+use network::*;
 #[repr(C)]
 pub struct RawImageInput {
   image: * const u8,

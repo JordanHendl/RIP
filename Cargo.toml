@@ -18,7 +18,12 @@ opt-level = 2
 [profile.release]
 opt-level = 3
 
+[build-dependencies]
+protobuf-codegen = "3"
+
 [dependencies]
+zmq = "0.10.0"
+protobuf = "3.2.0"
 runa = {path = "../runa_lib"}
 lazy_static = "1.4.0"
 json = "0.12.4"

@@ -1,18 +1,29 @@
 {
-  "dimensions": [512, 1024],
+  "dimensions": [512, 512],
   "starters": {
     "image_load": {
-      "path": "${SRC_DIR}/data/cat.jpeg"
+      "path": "${SRC_DIR}/data/test.png"
     }
   },
   "imgproc": {
     "tonemap": {
       "input": "image_load.output"
+    },
+    "monochrome": {
+      "mode": "intensity",
+      "input": "tonemap.output"
+    },
+    "adaptive_threshold": {
+      "radius": 8,
+      "input": "monochrome.output"
+    },
+    "connected_components": {
+      "input": "adaptive_threshold.output"
     }
   },
   "finishers": {
     "display": {
-      "input": "tonemap.output"
+      "input": "connected_components.output"
     }
   }
-}
+} 

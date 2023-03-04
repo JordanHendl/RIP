@@ -31,6 +31,17 @@ fn timestamps_differ(first: &Path, second: &Path) -> bool {
   return true;
 }
 
+fn compile_protobuf() {
+  let path = env!("CARGO_MANIFEST_DIR");
+  println!("cargo:rerun-if-changed=response.proto");
+  println!("cargo:rerun-if-changed=message.proto");
+  protobuf_codegen::Codegen::new()
+  .cargo_out_dir("protos")
+  .include(path)
+  .inputs([concat!(env!("CARGO_MANIFEST_DIR"), "/proto/message.proto"), concat!(env!("CARGO_MANIFEST_DIR"), "/proto/response.proto")])
+  .run_from_script();
+}
+
 fn compile_shaders() {
   // Make output directory for shaders.
   fs::create_dir_all("./target/shaders").expect("Failed to create shader compilation output directory!");
@@ -70,4 +81,5 @@ fn compile_shaders() {
 
 fn main() {
   compile_shaders();
+  compile_protobuf();
 }

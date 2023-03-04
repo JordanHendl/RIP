@@ -1,0 +1,15 @@
+syntax = "proto3";
+import "proto/response.proto";
+
+message RequestResponse {
+  string node_name = 1;
+}
+ 
+message Response {
+  string node_name = 1;
+  string description = 2;
+
+  oneof DetailedResponse {
+    ImageResponse image_response = 3;
+  }
+}

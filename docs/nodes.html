@@ -11,7 +11,7 @@
 <!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
 <!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
     <div>
-      <h3><u>Starter Nodes</u></h3>
+      <h3>Starter Nodes</h3>
       <p><b>Starter Nodes</b> are nodes that can only generate images.
         It is invalid for these nodes to receive any input parameters, but they all output images that can be consumed by other nodes via 
         [node_name].output
@@ -19,17 +19,22 @@
 
       <article>
         <h4>ImageLoad</h4>
+        <h5>JSON Identifier: <b>image_load</b></h5>
+        <h5>Description:</h5>
+        <p>This node generates an image by reading an image file from disk, uploading it to the GPU, and passing it to the next node.</p>
         <h5>Parameters:</h5>
         <table>
           <tr>
             <th>Name</th>
             <th>Type</th>
             <th>Description</th>
+            <th>Default</th>
           </tr>
           <tr>
             <th>path</th>
             <th>String</th>
             <th>The path to a file on disk to load. Supports .rgb, .png, .jpg/jpeg</th>
+            <th>None</th>
           </tr>
         </table>
       </article>
@@ -37,34 +42,243 @@
 <!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
 <!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
     <div>
-      <h3><u>Image Processing Nodes</u></h3>
+      <h3>Image Processing Nodes</h3>
       <p><b>Image Processing Nodes</b> are nodes that can receive and send images. 
         These nodes all have a required 'input' parameter, and all emit a [node_name].output parameter. <br>
         These nodes also can receive specialized data from other nodes. For a list of specialized data, see each individual node's parameters.
       </p>
-    </div>
-<!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
-<!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
-    <div>
-      <h3><u>Finisher Nodes</u></h3>
-      <p><b>Finisher Nodes</b> are nodes that can only receive images. These nodes all have a required "input" parameter, and cannot 
-        ever output anything.
-      </p>
-
 
       <article>
-        <h4>ImageWrite</h4>
+        <h4>Inverse</h4>
+        <h5>JSON Identifier: <b>inverse</b></h5>
+        <h5>Description:</h5>
+        <p>This node sends out the input image, with 1 - rgb as its output.</p>
         <h5>Parameters:</h5>
         <table>
           <tr>
             <th>Name</th>
             <th>Type</th>
             <th>Description</th>
+            <th>Default</th>
+          </tr>
+          <tr>
+            <th>None</th>
+            <th>None</th>
+            <th>None</th>
+            <th>None</th>
+          </tr>
+        </table>
+      </article>
+
+      <article>
+        <h4>Blur</h4>
+        <h5>JSON Identifier: <b>blur</b></h5>
+        <h5>Description:</h5>
+        <p>This node performs a blur kernel over the input image.</p>
+        <h5>Parameters:</h5>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Default</th>
+          </tr>
+          <tr>
+            <th>radius</th>
+            <th>Integer</th>
+            <th>The radius for the blur kernel. Higher means more blur effect!</th>
+            <th>5</th>
+          </tr>
+        </table>
+      </article>
+
+      <article>
+        <h4>Monochrome</h4>
+        <h5>JSON Identifier: <b>monochrome</b></h5>
+        <h5>Description:</h5>
+        <p>This node turns a color image into a greyscale one using a multitude of techniques.</p>
+        <h5>Parameters:</h5>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Default</th>
+          </tr>
+          <tr>
+            <th>mode</th>
+            <th>String</th>
+            <th>The mode of conversion.</th>
+            <th>cie_luma</th>
+          </tr>
+        </table>
+      </article>
+
+      <article>
+        <h4>Threshold</h4>
+        <h5>JSON Identifier: <b>threshold</b></h5>
+        <h5>Description:</h5>
+        <p>Calculates a global threshold value on the image, and binarizes the image using that threshold.</p>
+        <h5>Parameters:</h5>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Default</th>
+          </tr>
+          <tr>
+            <th>mode</th>
+            <th>String</th>
+            <th>The mode of conversion.</th>
+            <th>constant</th>
+          </tr>
+          <tr>
+            <th>constant</th>
+            <th>float</th>
+            <th>For constant thresholding, the constant value to compare against.</th>
+            <th>0.5</th>
+          </tr>
+        </table>
+
+        <article>
+          <h4>Adaptive Threshold</h4>
+          <h5>JSON Identifier: <b>adaptive_threshold</b></h5>
+          <h5>Description:</h5>
+          <p>Calculates a threshold per pixel, using the local area, then binarizes the image using those thresholds.</p>
+          <h5>Parameters:</h5>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Default</th>
+            </tr>
+            <tr>
+              <th>mode</th>
+              <th>String</th>
+              <th>The mode of conversion.</th>
+              <th>stddev</th>
+            </tr>
+            <tr>
+              <th>radius</th>
+              <th>Integer</th>
+              <th>The radius of the local area to sample.</th>
+              <th>4</th>
+            </tr>
+          </table>
+      </article>
+
+      <article>
+        <h4>Tonemap</h4>
+        <h5>JSON Identifier: <b>tonemap</b></h5>
+        <h5>Description:</h5>
+        <p>Rebalances the image's radiosity levels via applying a tone curve.</p>
+        <h5>Parameters:</h5>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Default</th>
+          </tr>
+          <tr>
+            <th>num_bins</th>
+            <th>Integer</th>
+            <th>The amount of bins to use for the internal histogram.</th>
+            <th>64</th>
+          </tr>
+          <tr>
+            <th>max_rad</th>
+            <th>Float</th>
+            <th>The highest possible radiance for the histogram's range.</th>
+            <th>1.0</th>
+          </tr>
+          <tr>
+            <th>min_rad</th>
+            <th>Float</th>
+            <th>The lowest possible radiance for the histogram's range.</th>
+            <th>0.0</th>
+          </tr>
+          <tr>
+            <th>mode</th>
+            <th>String</th>
+            <th>The way to generate the tonecurve.</th>
+            <th>normalized</th>
+          </tr>
+        </table>
+    </article>
+
+      <article>
+        <h4>Connected Components</h4>
+        <h5>JSON Identifier: <b>connected_components</b></h5>
+        <h5>Description:</h5>
+        <p>This node matches pixels of similar values into 'components'. Outputs both statistics & connected image.</p>
+        <h5>Parameters:</h5>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Default</th>
+          </tr>
+          <tr>
+            <th>None</th>
+            <th>None</th>
+            <th>None</th>
+            <th>None</th>
+          </tr>
+        </table>
+      </article>
+    </div>
+<!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+<!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+    <div>
+      <h3>Finisher Nodes</h3>
+      <p><b>Finisher Nodes</b> are nodes that can only receive images. These nodes all have a required "input" parameter, and cannot 
+        ever output anything.
+      </p>
+
+      <article>
+        <h4>ImageWrite</h4>
+        <h5>JSON Identifier: <b>image_write</b></h5>
+        <h5>Description:</h5>
+        <p>This node takes whatever image is input, and writes it to disk. Synchronizes the pipeline on the GPU every frame to do so.</p>
+        <h5>Parameters:</h5>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Default</th>
           </tr>
           <tr>
             <th>path</th>
             <th>String</th>
             <th>The path to save the output image to on disk</th>
+            <th>None</th>
+          </tr>
+        </table>
+      </article>
+
+      <article>
+        <h4>Display</h4>
+        <h5>JSON Identifier: <b>display</b></h5>
+        <h5>Description:</h5>
+        <p>Meant for displaying an image to a window. This node opens a window of the pipeline size and displays the input node's image onto it.</p>
+        <h5>Parameters:</h5>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Default</th>
+          </tr>
+          <tr>
+            <th>None</th>
+            <th>None</th>
+            <th>None</th>
+            <th>None</th>
           </tr>
         </table>
       </article>

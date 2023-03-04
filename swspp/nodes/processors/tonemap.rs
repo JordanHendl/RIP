@@ -165,7 +165,6 @@ impl SwsppNode for Tonemap {
 
     if self.data.input.is_some() {
       self.data.histogram.as_mut().unwrap().calculate(self.data.input.as_ref().unwrap(), cmd);
-      cmd.vector_write_barrier(&self.data.histogram.as_ref().unwrap().histogram());
     }
 
     let x = self.data.histogram.as_ref().unwrap().histogram().get_compute_groups(32);

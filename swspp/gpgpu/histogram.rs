@@ -98,11 +98,13 @@ impl Histogram {
     cmd.bind_compute(&self.data.clear_hist);
     cmd.bind(&self.data.clear_bg);
     cmd.dispatch(x, 1, 1);
+    cmd.vector_write_barrier(&self.data.histogram);
 
     let (x, y, z) = img.get_compute_groups(32, 32, 1);
     cmd.bind_compute(&self.data.calculate_hist);
     cmd.bind(&self.data.calculate_bg);
     cmd.dispatch(x, y, z);
+    cmd.vector_write_barrier(&self.data.histogram);
   }
 
   pub fn config(&self) -> &gpu::Vector<HistogramConfig> {
@@ -123,7 +125,7 @@ impl Histogram {
       self.data.clear_bg.bind_vector("data", &data);
       self.data.calculate_bg.bind_vector("data", &data);
       self.data.histogram = data;
-      
+
       let mapped = unsafe{self.data.config.map()};
       mapped[0].num_bins = num_bins;
       unsafe{self.data.config.unmap()};

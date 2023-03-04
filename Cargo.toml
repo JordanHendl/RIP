@@ -24,7 +24,7 @@ protobuf-codegen = "3"
 [dependencies]
 zmq = "0.10.0"
 protobuf = "3.2.0"
-runa = {path = "../runa_lib"}
+runa = {git = "https://github.com/JordanHendl/runa"}
 lazy_static = "1.4.0"
 json = "0.12.4"
 stb_image = "0.2.4"

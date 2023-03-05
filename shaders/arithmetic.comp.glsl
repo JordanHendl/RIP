@@ -10,12 +10,24 @@ layout(local_size_x = BLOCK_SIZE_X, local_size_y = BLOCK_SIZE_Y, local_size_z = 
 
 layout(binding = 0, rgba32f) coherent restrict readonly  uniform image2D input_tex_0;
 layout(binding = 1, rgba32f) coherent restrict readonly  uniform image2D input_tex_1;
-layout(binding = 3, rgba32f) coherent restrict writeonly uniform image2D output_tex;
+layout(binding = 2, rgba32f) coherent restrict writeonly uniform image2D output_tex;
+
+layout(binding = 3) uniform MonochromeConfig {
+  uint mode;
+} config;
 
 void main() {
   const ivec2 tex_coords = ivec2( gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
   vec4 color_1 = imageLoad( input_tex_0, tex_coords );
   vec4 color_2 = imageLoad( input_tex_1, tex_coords );
-  vec4 color = color_2 - color_1;
+  vec4 color = vec4(0.0f);
+  switch(config.mode) {
+    case 0 : color = color_1 - color_2; break;
+    case 1 : color = color_1 + color_2; break;
+    case 2 : color = color_1 * color_2; break;
+    case 3 : color = color_1 / color_2; break;
+    default: color = color_1 - color_2; break;
+  }
+
   imageStore(output_tex, tex_coords, color);
 }

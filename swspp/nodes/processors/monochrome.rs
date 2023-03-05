@@ -75,15 +75,16 @@ impl Monochrome {
     .name(&info.name)
     .build();
 
+  
+    let pipeline = gpu::ComputePipeline::new(&obj.interface, &info);
+    obj.data.bind_group = pipeline.bind_group();
+    obj.data.pipeline = pipeline;
+  
     let buff_info = gpu::BufferCreateInfo::builder()
     .gpu(0)
     .size(1)
     .build();
-
-    let pipeline = gpu::ComputePipeline::new(&obj.interface, &info);
-    obj.data.bind_group = pipeline.bind_group();
-    obj.data.pipeline = pipeline;
-
+  
     let default_config: MonochromeConfig = Default::default();
     obj.data.config = Some(gpu::Vector::new(&obj.interface, &buff_info));
     obj.data.config.as_mut().unwrap().upload(std::slice::from_ref(&default_config));

@@ -32,6 +32,7 @@ fn get_finisher_functors() -> HashMap<String, Callback> {
 
 fn get_functors() -> HashMap<String, Callback> {
   let mut functors: HashMap<String, Callback> = Default::default();
+  functors.insert("arithmetic".to_string(), processors::Arithmetic::new);
   functors.insert("tonemap".to_string(), processors::Tonemap::new);
   functors.insert("monochrome".to_string(), processors::Monochrome::new);
   functors.insert("inverse".to_string(), processors::Inverse::new);
@@ -66,19 +67,22 @@ fn find_connections(starter_ids: &HashMap<String, usize>, node_ids: &HashMap<Str
       let mut has_all_deps = 0;
       let mut dep_names:Vec<String> = Vec::new();
       
+      let raw_input = &node.1["input"];
       
-      if node.1.is_array() {
+      if raw_input.is_array() {
         num_deps = node.1.len();
-        let node_inputs = &node.1["input"];
-        for i in 0..node_inputs.len() {
-          let input_name = node_inputs[i].as_str().unwrap();
-          if inserted_nodes.contains(input_name) {
+        for i in 0..raw_input.len() {
+          let mut input_name = raw_input[i].as_str().unwrap().to_string();
+          let is_an_output = input_name.find(".output");
+          input_name = input_name.chars().take(is_an_output.unwrap()).collect();
+
+          if inserted_nodes.contains(&input_name) {
             has_all_deps += 1;
-            dep_names.push(input_name.to_string());
+            dep_names.push(input_name.clone());
           }
         }
       } else {
-        let input = node.1["input"].as_str().as_ref().unwrap().to_string().clone();
+        let input = raw_input.as_str().as_ref().unwrap().to_string().clone();
         let is_an_output = input.find(".output");
         if is_an_output.is_none() {
           panic!("Some node doesn't have it's input specified correctly. Inputs should come in the form 'input: \"other_node.output\"'");

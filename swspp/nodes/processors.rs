@@ -11,8 +11,8 @@ pub use inverse::*;
 pub mod blur;
 pub use blur::*;
 
-pub mod difference;
-pub use difference::*;
+pub mod arithmetic;
+pub use arithmetic::*;
 
 pub mod threshold;
 pub use threshold::*;

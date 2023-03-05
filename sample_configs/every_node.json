@@ -1,0 +1,21 @@
+{
+  "dimensions": [512, 1024],
+  "starters": {
+    "image_load": {
+      "path": "${SRC_DIR}/data/cat.jpeg"
+    },
+    "image_load_2": {
+      "type": "image_load",
+      "path": "${SRC_DIR}/data/tulips.jpeg"
+    }
+  },
+  "finishers": {
+    "display": {
+      "input": "image_load.output"
+    },
+    "display_2": {
+      "type": "display",
+      "input": "image_load_2.output"
+    }
+  }
+} 

@@ -127,6 +127,11 @@ impl Pipeline {
       let cb = Box::new(move |event: &sdl2::event::Event| { 
         if event.is_window() {
           match event {
+            sdl2::event::Event::Window { timestamp, window_id, win_event } => {
+              if *win_event == sdl2::event::WindowEvent::Close {
+                *s.borrow_mut() = false;
+              }
+            },
             sdl2::event::Event::Quit { .. } => *s.borrow_mut() = false,
             _ => {},
           }

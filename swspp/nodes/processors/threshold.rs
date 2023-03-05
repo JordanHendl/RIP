@@ -133,6 +133,6 @@ impl SwsppNode for Threshold {
   }
 
   fn node_type(&self) -> String {
-    return "monochrome".to_string();
+    return "threshold".to_string();
   }
 }

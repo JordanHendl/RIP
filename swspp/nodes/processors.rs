@@ -17,6 +17,9 @@ pub use difference::*;
 pub mod threshold;
 pub use threshold::*;
 
+pub mod transform;
+pub use transform::*;
+
 pub mod adaptive_threshold;
 pub use adaptive_threshold::*;
 

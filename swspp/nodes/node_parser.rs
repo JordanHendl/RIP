@@ -37,6 +37,7 @@ fn get_functors() -> HashMap<String, Callback> {
   functors.insert("threshold".to_string(), processors::Threshold::new);
   functors.insert("adaptive_threshold".to_string(), processors::AdaptiveThreshold::new);
   functors.insert("blur".to_string(), processors::Blur::new);
+  functors.insert("transform".to_string(), processors::Transform::new);
   functors.insert("connected_components".to_string(), processors::ConnectedComponents::new);
   return functors;
 }

@@ -6,24 +6,27 @@
     }
   },
   "imgproc": {
-    "tonemap": {
+    "transform": {
+      "off_x": 0.0,
+      "off_y": 256.0,
+
+      "scale_x": 1.0,
+      "scale_y": 1.0,
+      
+      "shear_x": 0.1,
+      "shear_y": 0.5,
+
+      "rotation": 0,
       "input": "image_load.output"
     },
-    "monochrome": {
-      "mode": "intensity",
-      "input": "tonemap.output"
-    },
-    "adaptive_threshold": {
-      "radius": 8,
-      "input": "monochrome.output"
-    },
-    "connected_components": {
-      "input": "adaptive_threshold.output"
+    "blur": {
+      "radius": 0,
+      "input": "transform.output"
     }
   },
   "finishers": {
     "display": {
-      "input": "connected_components.output"
+      "input": "blur.output"
     }
   }
 } 

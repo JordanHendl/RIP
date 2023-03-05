@@ -1,0 +1,23 @@
+{
+  "dimensions": [512, 512],
+  "starters": {
+    "pattern": {
+      "mode": "circle"
+    },
+    "pattern_2": {
+      "type": "pattern",
+      "mode": "horizontal_color_bar"
+    }
+  },
+  "imgproc": {
+    "arithmetic": {
+      "mode": "multiply",
+      "input": ["pattern.output", "pattern_2.output"]
+    }
+  },
+  "finishers": {
+    "display": {
+      "input": "arithmetic.output"
+    }
+  }
+} 

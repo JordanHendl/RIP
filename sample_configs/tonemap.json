@@ -1,0 +1,22 @@
+{
+  "dimensions": [512, 1024],
+  "starters": {
+    "image_load": {
+      "path": "${SRC_DIR}/data/cat.jpeg"
+    }
+  },
+  "imgproc": {
+    "monochrome": {
+      "mode": "intensity",
+      "input": "image_load.output"
+    },
+    "tonemap": {
+      "input": "monochrome.output"
+    }
+  },
+  "finishers": {
+    "display": {
+      "input": "tonemap.output"
+    }
+  }
+} 

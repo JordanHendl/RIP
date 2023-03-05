@@ -127,8 +127,8 @@ impl Transform {
       t[5] = r_cos;
 
       // Scale
-      t[0] = self.data.scale[0];
-      t[5] = self.data.scale[1];
+      t[0] *= self.data.scale[0];
+      t[5] *= self.data.scale[1];
 
       // Translation
       t[8] += self.data.position[0];

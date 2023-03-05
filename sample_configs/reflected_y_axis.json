@@ -1,0 +1,28 @@
+{
+  "dimensions": [512, 1024],
+  "starters": {
+    "image_load": {
+      "path": "${SRC_DIR}/data/cat.jpeg"
+    }
+  },
+  "imgproc": {
+    "transform": {
+      "off_x": 0.0,
+      "off_y": 1024.0,
+
+      "scale_x": 1.0,
+      "scale_y": -1.0,
+      
+      "shear_x": 0.0,
+      "shear_y": 0.0,
+
+      "rotation": 0,
+      "input": "image_load.output"
+    }
+  },
+  "finishers": {
+    "display": {
+      "input": "transform.output"
+    }
+  }
+} 

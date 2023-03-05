@@ -69,8 +69,10 @@ impl SwsppNode for Display {
 
       let views = self.data.window.as_mut().unwrap().views_mut();
       //cmd.blit_views(self.data.view.as_ref().unwrap(), & mut views[self.data.num_images_blitted as usize]);
-      cmd.blit_views(self.data.view.as_ref().unwrap(), & mut views[0]);
-      cmd.blit_views(self.data.view.as_ref().unwrap(), & mut views[1]);
+
+      for view in views {
+        cmd.blit_views(self.data.view.as_ref().unwrap(), view);
+      }
 
       // Tell the command to signal sems for the window when submitted.
       cmd.combo_next_action_into_window(self.data.window.as_ref().unwrap());

@@ -18,6 +18,7 @@ fn get_reserved_strings() -> HashMap<String, String> {
 
 fn get_starter_functors() -> HashMap<String, Callback> {
   let mut functors: HashMap<String, Callback> = Default::default();
+  functors.insert("pattern".to_string(), starters::Pattern::new);
   functors.insert("image_load".to_string(), starters::ImageLoad::new);
   return functors;
 }

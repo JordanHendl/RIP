@@ -1,23 +1,23 @@
 {
   "dimensions": [512, 512],
   "starters": {
-    "image_load": {
-      "path": "${SRC_DIR}/data/test.png"
+    "pattern": {
+      "mode": "horizontal_color_bar"
     }
   },
   "imgproc": {
     "transform": {
       "off_x": 0.0,
-      "off_y": 256.0,
+      "off_y": 0.0,
 
       "scale_x": 1.0,
       "scale_y": 1.0,
       
-      "shear_x": 0.1,
-      "shear_y": 0.5,
+      "shear_x": 0.2,
+      "shear_y": 0.1,
 
-      "rotation": 0,
-      "input": "image_load.output"
+      "rotation": 0.0,
+      "input": "pattern.output"
     },
     "blur": {
       "radius": 0,

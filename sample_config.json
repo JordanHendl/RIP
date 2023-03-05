@@ -1,38 +1,13 @@
 {
   "dimensions": [512, 512],
   "starters": {
-    "image_load": {
-      "path": "${SRC_DIR}/data/tulips.png"
-    },
-    "image_load_2": {
-      "type": "image_load",
-      "path": "${SRC_DIR}/data/peppers.png"
-    }
-  },
-  "imgproc": {
-    "transform": {
-      "off_x": 512.0,
-      "off_y": 0.0,
-      "scale_x": -1.0,
-      "scale_y": 1.0,
-      "input": "image_load.output"
-    },
-    "transform_2": {
-      "type": "transform",
-      "off_x": 0.0,
-      "off_y": 512.0,
-      "scale_x": 1.0,
-      "scale_y": -1.0,
-      "input": "image_load_2.output"
+    "pattern": {
+      "mode": "circle"
     }
   },
   "finishers": {
     "display": {
-      "input": "transform.output"
-    },
-    "display_2": {
-      "type": "display",
-      "input": "transform_2.output"
+      "input": "pattern.output"
     }
   }
 } 

@@ -1,0 +1,53 @@
+{
+  "dimensions": [1280, 1024],
+  "starters": {
+    "image_load": {
+      "path": "${SRC_DIR}/data/peppers.png"
+    }
+  },
+  "imgproc": {
+    "monochrome": {
+      "mode": "intensity",
+      "input": "image_load.output"
+    },
+    "tonemap": {
+      "input": "monochrome.output"
+    },
+    "transform": {
+      "off_x": 1280.0,
+      "off_y": 0.0,
+      "scale_x": -1.0,
+      "scale_y": 1.0,
+      "input": "tonemap.output"
+    },
+    "blur": {
+      "radius": 8,
+      "input": "transform.output"
+    },
+    "adaptive_threshold": {
+      "mode": "stddev",
+      "radius": 8,
+      "input": "blur.output"
+    },
+    "threshold": {
+      "mode": "constant",
+      "constant": 0.15,
+      "input": "blur.output"
+    },
+    "arithmetic": {
+      "mode": "multiply",
+      "input": ["adaptive_threshold.output", "threshold.output"]
+    }, 
+    "inverse": {
+      "input": "arithmetic.output"
+    },
+    "connected_components": {
+      "input": "inverse.output"
+    }
+  },
+  "finishers": {
+    "display": {
+      "input": "connected_components.output"
+    }
+  }
+} 

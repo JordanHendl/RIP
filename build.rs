@@ -68,9 +68,9 @@ fn compile_shaders() {
       shader_full_path.push_str(&file_name.to_str().unwrap());
       
       let output = format!("./target/shaders/{stem}.spirv", stem=stem.unwrap().to_str().unwrap());
-      
+      let include_dir = "-I./shaders/include/";
       let status = std::process::Command::new("glslangValidator")
-      .args(["-g", "-V", "-Od", "-o", &output, &shader_full_path])
+      .args(["-g", "-V", include_dir, "-Od", "-o", &output, &shader_full_path])
       .status()
       .expect("Failed to compile shader!");
       assert!(status.success());

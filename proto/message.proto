@@ -1,8 +1,16 @@
 syntax = "proto3";
 import "proto/response.proto";
 
-message RequestResponse {
+enum RequestType {
+  Image = 0;
+  Components = 1;
+  Details = 2;
+  Video = 3;
+}
+
+message Request {
   string node_name = 1;
+  RequestType request_type = 2;
 }
  
 message Response {
@@ -10,6 +18,7 @@ message Response {
   string description = 2;
 
   oneof DetailedResponse {
-    ImageResponse image_response = 3;
+    NoneResponse none_response = 3;
+    ImageResponse image_response = 4;
   }
 }

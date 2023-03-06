@@ -1,5 +1,9 @@
 syntax = "proto3";
 
+message NoneResponse {
+  string msg = 1;
+}
+
 message ImageResponse {
   int32 width = 1;
   int32 height = 2;

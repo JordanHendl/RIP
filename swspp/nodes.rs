@@ -1,6 +1,7 @@
 extern crate runa;
 extern crate json;
-use std::{collections::{HashMap, HashSet, hash_map::Entry}, hash::Hash, cell::RefCell, rc::Rc};
+use std::{collections::{HashMap, HashSet, hash_map::Entry}, hash::Hash, cell::RefCell, rc::Rc, io::Read};
+use protobuf::Message;
 use runa::{*, gpu::ImageView};
 use json::*;
 use crate::common::data_bus::DataBus;
@@ -13,6 +14,9 @@ mod starters;
 mod processors;
 mod node_parser;
 
+include!(concat!(env!("OUT_DIR"), "/protos/mod.rs"));
+pub use message::*;
+
 pub trait SwsppNode {
   fn name(&self) -> String;
   fn node_type(&self) -> String;
@@ -20,6 +24,13 @@ pub trait SwsppNode {
   fn input(& mut self, image: &gpu::ImageView); 
   fn execute(& mut self, cmd: & mut gpu::CommandList);
   fn post_execute(& mut self, _cmd: & mut gpu::CommandList) {}
+  fn receive_message(& mut self, _cmd: & mut gpu::CommandList, _message: &message::Request) -> message::Response {
+    let mut r = message::Response::new();
+    let mut none_response = response::NoneResponse::new();
+    none_response.msg = "Node has not implemented network responses!".to_string();
+    r.set_none_response(none_response);
+    return r;
+  }
 }
 
 // Information needed for any node to create itself.
@@ -29,6 +40,8 @@ pub struct NodeCreateInfo {
 }
 
 pub struct Pipeline {
+  node_name_map: HashMap<String, usize>,
+  network: network::Manager,
   register: gpu::EventSubscriber,
   images: Vec<gpu::Image>,
   views: Vec<gpu::ImageView>,
@@ -55,6 +68,14 @@ impl Pipeline {
     .format(gpu::ImageFormat::RGBA32F)
     .build();
 
+    // Now, we need to fill out the node map with the names;
+    let mut id = 0;
+    for n in &nodes {
+      self.node_name_map.insert(n.name(), id as usize);
+      id += 1;
+    }
+    
+    // Then, populate images.
     self.images.resize_with(nodes.len(), || {gpu::Image::new(&self.interface, &img_info)});
     self.views.reserve(self.images.len());
 
@@ -98,6 +119,8 @@ impl Pipeline {
       first: true,
       should_run: Rc::new(RefCell::new(true)),
       register: Default::default(),
+      network: network::Manager::new(),
+      node_name_map: Default::default(),
     };
 
     let info = gpu::CommandListCreateInfo::builder()
@@ -118,6 +141,61 @@ impl Pipeline {
 
   pub fn should_run(&self) -> bool {
     return *self.should_run.as_ref().borrow();
+  }
+
+  fn handle_network(& mut self) {
+    let result = self.network.receive_message();
+    let mut req: Option<message::Request> = None;
+    if result.is_some() {
+      println!("Received message!");
+      let msg = result.unwrap();
+      let bytes = msg.bytes();
+      let wrapped: std::result::Result<Vec<u8>, std::io::Error> = bytes.collect();
+      if wrapped.is_ok() {
+        println!("Received message");
+        let raw = wrapped.unwrap();
+        req = Some(message::Request::parse_from_bytes(&raw).expect("Received unknown message!"));
+      }
+    }
+
+    if req.is_some() {
+      let r = req.as_ref().unwrap();
+      println!("Received message!");
+      if r.request_type == message::RequestType::Image.into() {
+        if !self.first {self.cmds[0].synchronize();}
+        let name = r.node_name.clone();
+        let node_id = self.node_name_map.get(&name);
+
+        match node_id {
+            Some(id) => {
+              let mut response = message::Response::new();
+              let mut img_response = response::ImageResponse::new();
+              let img = &self.views[*id];
+              let data = img.sync_get_pixels();
+              response.description = "Image data from node".to_string();
+
+              img_response.width = img.width() as i32;
+              img_response.height = img.height() as i32;
+              img_response.num_channels = 4;
+              match data {
+                gpu::ImagePixels::ImageF32(img) => {
+                  img_response.image = img;
+                },
+                gpu::ImagePixels::ImageU8(_) => todo!(),
+              }
+
+              response.set_image_response(img_response);
+              self.network.send_response(response);
+            },
+            None => todo!(),
+        }
+      } else {
+        let name = r.node_name.clone();
+        let node_id = self.node_name_map.get(&name);
+        let response = self.nodes[*node_id.unwrap()].receive_message(& mut self.cmds[0], &r);
+        self.network.send_response(response);
+      }
+    }
   }
 
   pub fn execute(& mut self) {
@@ -149,6 +227,7 @@ impl Pipeline {
       self.nodes[*node_id as usize].post_execute(& mut self.cmds[0]);
     }
 
+    self.handle_network();
     self.interface.as_ref().borrow_mut().poll_events();
   }
 }

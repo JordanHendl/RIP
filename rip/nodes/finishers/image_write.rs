@@ -3,7 +3,7 @@ extern crate stb_image;
 use std::cell::RefCell;
 use std::rc::Rc;
 use super::NodeCreateInfo;
-use super::SwsppNode;
+use super::RipNode;
 use super::common::*;
 use runa::*;
 use stb_image_write_rust::ImageWriter::ImageWriter;
@@ -16,7 +16,7 @@ struct ImageWriteData {
 impl Default for ImageWriteData {
   fn default() -> Self {
       return ImageWriteData { 
-        path: "swspp_image_output.png".to_string(),
+        path: "rip_image_output.png".to_string(),
         view: None,
       };
   }
@@ -32,7 +32,7 @@ impl ImageWrite {
     self.data.path = file.clone();
   }
 
-  pub fn new(info: &NodeCreateInfo) -> Box<dyn SwsppNode + Send> {
+  pub fn new(info: &NodeCreateInfo) -> Box<dyn RipNode + Send> {
     println!("Creating node {} as an image write finisher node!", info.name);
     let mut image_write = Box::new(ImageWrite {
       _interface: info.interface.clone(),
@@ -51,7 +51,7 @@ impl ImageWrite {
   }
 }
 
-impl SwsppNode for ImageWrite {
+impl RipNode for ImageWrite {
   fn execute(& mut self, _cmd: & mut gpu::CommandList) {
     println!("Executing Node {}", self.name);
   }

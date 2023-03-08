@@ -1,5 +1,5 @@
-extern crate swspp;
-use swspp::*;
+extern crate rip;
+use rip::*;
 use std::ffi::{CString};
 fn main() {
   let string = std::env::args().nth(1).expect("No Configuration path given! Aborting.");
@@ -7,20 +7,20 @@ fn main() {
   println!("Testing with config located at: {}", path);
   let path = CString::new(path).unwrap();
   let c_string = path.as_c_str().as_ptr();
-  let _id = swspp_create_pipeline(c_string);
+  let _id = rip_create_pipeline(c_string);
 
 
   let args = std::env::args().nth(2);
   if args.is_some() {
     let str = args.unwrap().clone();
     if str.eq(&"--repeat".to_string()) {
-      while swspp_should_run() {
-        swspp_pulse();
+      while rip_should_run() {
+        rip_pulse();
       }
     } else {
-      swspp_pulse();  
+      rip_pulse();  
     }
   } else {
-    swspp_pulse();
+    rip_pulse();
   }
 }

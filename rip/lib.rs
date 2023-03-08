@@ -42,23 +42,23 @@ pub struct VulkanImportInfo {
 }
 
 #[derive(Default)]
-struct SwsppData {
+struct RipData {
   pipelines: std::collections::HashMap<u32, nodes::Pipeline>,
   counter: u32,
 }
 
-unsafe impl Send for SwsppData {}
+unsafe impl Send for RipData {}
 
 use lazy_static::lazy_static;
 use runa::gpu;
 
 lazy_static! {
-  static ref SWSPP_DATA: std::sync::Mutex<SwsppData> = Default::default();
+  static ref RIP_DATA: std::sync::Mutex<RipData> = Default::default();
 }
 
 #[no_mangle]
-pub extern "C" fn swspp_should_run() -> bool {
-  let mut data = SWSPP_DATA.lock().expect("Unable to lock SWSPP static data!");
+pub extern "C" fn rip_should_run() -> bool {
+  let mut data = RIP_DATA.lock().expect("Unable to lock RIP static data!");
   for pipeline in & mut data.pipelines {
     if pipeline.1.should_run() == false {return false;};
   }
@@ -67,8 +67,8 @@ pub extern "C" fn swspp_should_run() -> bool {
 }
 
 #[no_mangle]
-pub extern "C" fn swspp_create_pipeline(config: *const i8) -> u32 {
-  let mut data = SWSPP_DATA.lock().expect("Unable to lock SWSPP static data!");
+pub extern "C" fn rip_create_pipeline(config: *const i8) -> u32 {
+  let mut data = RIP_DATA.lock().expect("Unable to lock RIP static data!");
   let id = data.counter;
   
   let c_string = unsafe{std::ffi::CStr::from_ptr(config)};
@@ -81,13 +81,13 @@ pub extern "C" fn swspp_create_pipeline(config: *const i8) -> u32 {
 }
 
 #[no_mangle]
-pub extern "C" fn swspp_start_pipeline(_pipeline_id: u32) {
+pub extern "C" fn rip_start_pipeline(_pipeline_id: u32) {
     
 }
 
 #[no_mangle]
-pub extern "C" fn swspp_pulse() {
-  let mut data = SWSPP_DATA.lock().expect("Unable to lock SWSPP static data!");
+pub extern "C" fn rip_pulse() {
+  let mut data = RIP_DATA.lock().expect("Unable to lock RIP static data!");
   for pipeline in & mut data.pipelines {
     pipeline.1.execute();
   }
@@ -102,8 +102,8 @@ mod tests {
       println!("Testing with config located at: {}", raw_path);
       let path = CString::new(raw_path).unwrap();
       let c_string = path.as_c_str().as_ptr();
-      let _id = swspp_create_pipeline(c_string);
+      let _id = rip_create_pipeline(c_string);
 
-      swspp_pulse();
+      rip_pulse();
     }
 }

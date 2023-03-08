@@ -1,16 +1,16 @@
 [package]
-name = "swspp"
+name = "rip"
 version = "0.1.0"
 edition = "2021"
 crate-type = ["cdylib"]
 
 [lib]
-name = "swspp"
-path = "swspp/lib.rs"
+name = "rip"
+path = "rip/lib.rs"
 
 [[bin]]
-name = "swspp"
-path = "swspp/bin.rs"
+name = "rip"
+path = "rip/bin.rs"
 
 [profile.release]
 opt-level = 3

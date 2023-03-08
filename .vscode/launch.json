@@ -8,7 +8,7 @@
       "type": "lldb",
       "request": "launch",
       "name": "Launch",
-      "program": "${workspaceFolder}/target/debug/swspp.exe",
+      "program": "${workspaceFolder}/target/debug/rip.exe",
       "args": ["${workspaceFolder}/sample_config.json", "--repeat"],
       "cwd": "${workspaceFolder}"
     },
@@ -16,16 +16,16 @@
 //    {
 //      "type": "lldb",
 //      "request": "launch",
-//      "name": "Debug unit tests in library 'swspp'",
+//      "name": "Debug unit tests in library 'rip'",
 //      "cargo": {
 //        "args": [
 //          "test",
 //          "--no-run",
 //          "--lib",
-//          "--package=swspp"
+//          "--package=rip"
 //        ],
 //        "filter": {
-//          "name": "swspp",
+//          "name": "rip",
 //          "kind": "lib"
 //        }
 //      },

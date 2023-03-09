@@ -17,6 +17,8 @@ ImgProc nodes both consume and generate images. This may be multiple input, or m
 | Name of sample configuration   | Output |
 | ---------------------------    | ------ |
 | arithmetic_multiple_input.json | ![](https://i.imgur.com/MvroQI8.png) |
+| tonemap.json | ![](https://i.imgur.com/m08E0iv.png) |
+| transform.json | ![](https://i.imgur.com/t5SPpjj.png) |
 | chroma_key.json | ![](https://i.imgur.com/YJ1sCgR.png) |
 | circle_pattern.json | ![](https://i.imgur.com/0cVE3fk.png) |
 | color_spaces.json | ![](https://i.imgur.com/UFEJpIE.png) |

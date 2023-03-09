@@ -1,0 +1,32 @@
+{
+  "dimensions": [512, 512],
+  "starters": {
+    "image_load": {
+      "path": "${SRC_DIR}/data/peppers.png"
+    }
+  },
+  "imgproc": {
+    "transform": {
+      "off_x": 512.0,
+      "off_y": 0.0,
+
+      "scale_x": -1.0,
+      "scale_y": 1.0,
+      
+      "shear_x": 0.1,
+      "shear_y": 0.2,
+
+      "rotation": 4.0,
+      "input": "image_load.output"
+    },
+    "blur": {
+      "radius": 2,
+      "input": "transform.output"
+    }
+  },
+  "finishers": {
+    "display": {
+      "input": "blur.output"
+    }
+  }
+} 

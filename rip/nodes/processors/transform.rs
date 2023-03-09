@@ -12,6 +12,7 @@ use runa::*;
 /// Structure declarations
 ///////////////////////////////////////////////////
 
+#[repr(C)]
 struct TransformConfig {
   transformation: [f32;16],
 }

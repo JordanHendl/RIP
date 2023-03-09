@@ -100,6 +100,7 @@ impl Arithmetic {
 // Base class implementations
 impl RipNode for Arithmetic {
   fn execute(& mut self, cmd: & mut gpu::CommandList) {
+    assert!(self.data.num_received_inputs == 2, "Trying to use an Arithmetic node without giving it the required amount of inputs (2).");
     println!("Executing Node {}", self.name);
     let (x, y, z) = self.data.image.as_ref().unwrap().get_compute_groups(32, 32, 1);
     cmd.bind_compute(&self.data.pipeline);
@@ -115,6 +116,7 @@ impl RipNode for Arithmetic {
       self.data.num_received_inputs += 1;
     } else if self.data.num_received_inputs == 1 {
       self.data.bind_group.bind_image_view("input_tex_1", image);
+      self.data.num_received_inputs += 1;
     }
   }
 

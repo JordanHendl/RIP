@@ -13,21 +13,22 @@ use runa::*;
 ///////////////////////////////////////////////////
 
 #[repr(C)]
-struct BlurConfig {
-  radius: u32,
+struct OverlayConfig {
+  dummy: u32,
 }
 
 #[derive(Default)]
-struct BlurData {
+struct OverlayData {
+  num_received_inputs: u32,
   image: Option<gpu::ImageView>,
-  config: Option<gpu::Vector<BlurConfig>>,
+  config: Option<gpu::Vector<OverlayConfig>>,
   pipeline: gpu::ComputePipeline,
   bind_group: gpu::BindGroup,
 }
 
-pub struct Blur {
+pub struct Overlay {
   interface: Rc<RefCell<gpu::GPUInterface>>,
-  data: BlurData,
+  data: OverlayData,
   data_bus: crate::common::DataBus,
   name: String,
 }
@@ -37,31 +38,25 @@ pub struct Blur {
 ///////////////////////////////////////////////////
 
 // Need send to send through threads safely
-unsafe impl Send for Blur {}
+unsafe impl Send for Overlay {}
 
-impl Default for BlurConfig {
+impl Default for OverlayConfig {
   fn default() -> Self {
-      return BlurConfig { radius: 5 }
+      return OverlayConfig { dummy: 0,}
   }
 }
 
 // Implementations specific to this node
-impl Blur {
-  pub fn set_radius(& mut self, radius: &u32) {
-    println!("Setting radius {} for node {}", *radius, self.name);
-    let default_config: BlurConfig = BlurConfig { radius: *radius };
-    self.data.config.as_mut().unwrap().upload(std::slice::from_ref(&default_config));
-  }
-
+impl Overlay {
   pub fn new(info: &NodeCreateInfo) -> Box<dyn RipNode + Send> {
-    let mut obj = Box::new(Blur {
+    let mut obj = Box::new(Overlay {
       interface: info.interface.clone(),
       data: Default::default(),
       data_bus: Default::default(),
       name: info.name.to_string(),
     });
 
-    let raw_shader = common::to_u32_slice(include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/target/shaders/blur.spirv")).as_ref());
+    let raw_shader = common::to_u32_slice(include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/target/shaders/overlay.spirv")).as_ref());
     let info = gpu::ComputePipelineCreateInfo::builder()
     .gpu(0)
     .shader(raw_shader)
@@ -72,29 +67,29 @@ impl Blur {
     .gpu(0)
     .size(1)
     .build();
-    
-    let default_config: BlurConfig = Default::default();
-    obj.data.config = Some(gpu::Vector::new(&obj.interface, &buff_info));
-    obj.data.config.as_mut().unwrap().upload(std::slice::from_ref(&default_config));
 
     let pipeline = gpu::ComputePipeline::new(&obj.interface, &info);
     obj.data.bind_group = pipeline.bind_group();
     obj.data.pipeline = pipeline;
-    obj.data.bind_group.bind_vector("config", obj.data.config.as_ref().unwrap());
+
+    let default_config: OverlayConfig = Default::default();
+    obj.data.config = Some(gpu::Vector::new(&obj.interface, &buff_info));
+    obj.data.config.as_mut().unwrap().upload(std::slice::from_ref(&default_config));
 
     let mut bus: DataBus = Default::default();
     let name = info.name.clone();
-    bus.add_object_subscriber(&(name + "::radius"), obj.as_mut(), Blur::set_radius);
     obj.data_bus = bus;
 
+    obj.data.bind_group.bind_vector("config", obj.data.config.as_ref().unwrap());
     return obj;
   }
 }
 
 // Base class implementations
-impl RipNode for Blur {
+impl RipNode for Overlay {
   fn execute(& mut self, cmd: & mut gpu::CommandList) {
     println!("Executing Node {}", self.name);
+    assert!(self.data.num_received_inputs == 2, "Trying to use a chroma key node without giving it the required amount of inputs (2).");
     let (x, y, z) = self.data.image.as_ref().unwrap().get_compute_groups(32, 32, 1);
     cmd.bind_compute(&self.data.pipeline);
     cmd.bind(&self.data.bind_group);
@@ -103,7 +98,13 @@ impl RipNode for Blur {
   }
 
   fn input(& mut self, image: &gpu::ImageView) {
-    self.data.bind_group.bind_image_view("input_tex", image);
+    if self.data.num_received_inputs == 0 {
+      self.data.bind_group.bind_image_view("input_tex_0", image);
+      self.data.num_received_inputs += 1;
+    } else if self.data.num_received_inputs == 1 {
+      self.data.bind_group.bind_image_view("input_tex_1", image);
+      self.data.num_received_inputs += 1;
+    }
   }
 
   fn assign(& mut self, view: &gpu::ImageView) {
@@ -111,11 +112,12 @@ impl RipNode for Blur {
     self.data.bind_group.bind_image_view("output_tex", &self.data.image.as_ref().unwrap());
   }
 
+
   fn name(&self) -> String {
     return self.name.clone();
   }
 
   fn node_type(&self) -> String {
-    return "blur".to_string();
+    return "overlay".to_string();
   }
 }

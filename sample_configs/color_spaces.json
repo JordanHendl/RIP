@@ -1,0 +1,34 @@
+{
+  "dimensions": [512, 512],
+  "starters": {
+    "image_load": {
+      "path": "${SRC_DIR}/data/peppers.png"
+    }
+  },
+  "imgproc": {
+    "color_space_conversion": {
+      "src_space": "rgb",
+      "dst_space": "YCbCr",
+      "input": "image_load.output"
+    },
+    "color_space_conversion_2": {
+      "type": "color_space_conversion",
+      "src_space": "YCbCr",
+      "dst_space": "rgb",
+      "input": "color_space_conversion.output"
+    }
+  },
+  "finishers": {
+    "display": {
+      "input": "color_space_conversion.output"
+    },
+    "display_2": {
+      "type": "display",
+      "input": "color_space_conversion_2.output"
+    },
+    "display_3": {
+      "type": "display",
+      "input": "image_load.output"
+    }
+  }
+} 

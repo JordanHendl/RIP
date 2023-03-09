@@ -39,6 +39,10 @@ fn get_functors() -> HashMap<String, Callback> {
   functors.insert("threshold".to_string(), processors::Threshold::new);
   functors.insert("adaptive_threshold".to_string(), processors::AdaptiveThreshold::new);
   functors.insert("blur".to_string(), processors::Blur::new);
+  functors.insert("chroma_key".to_string(), processors::ChromaKey::new);
+  functors.insert("crop".to_string(), processors::Crop::new);
+  functors.insert("overlay".to_string(), processors::Overlay::new);
+  functors.insert("color_space_conversion".to_string(), processors::ColorSpaceConversion::new);
   functors.insert("transform".to_string(), processors::Transform::new);
   functors.insert("connected_components".to_string(), processors::ConnectedComponents::new);
   return functors;
@@ -70,7 +74,7 @@ fn find_connections(starter_ids: &HashMap<String, usize>, node_ids: &HashMap<Str
       let raw_input = &node.1["input"];
       
       if raw_input.is_array() {
-        num_deps = node.1.len();
+        num_deps = raw_input.len();
         for i in 0..raw_input.len() {
           let mut input_name = raw_input[i].as_str().unwrap().to_string();
           let is_an_output = input_name.find(".output");

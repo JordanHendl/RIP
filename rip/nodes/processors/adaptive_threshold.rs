@@ -12,6 +12,7 @@ use runa::*;
 /// Structure declarations
 ///////////////////////////////////////////////////
 
+#[repr(C)]
 struct AdaptiveThresholdConfig {
   radius: u32,
   mode: u32,

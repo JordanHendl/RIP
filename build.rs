@@ -48,18 +48,19 @@ fn compile_shaders() {
   let path = Path::new("./shaders");
   let out_path = std::path::PathBuf::from(std::env::var("OUT_DIR").unwrap());
 
-  visit_dirs(path, & mut |dir_entry|
-  {
+  visit_dirs(path, & mut |dir_entry| {
+    
     let mut string : String = "cargo:rerun-if-changed=".to_owned();
     let path = dir_entry.path().clone();
     let file_name = dir_entry.file_name().to_owned();
     let tmp_stem = std::path::Path::new(path.file_stem().clone().unwrap());
     let stem = tmp_stem.file_stem().clone();
-  
+    
     // Make sure we rebuild on change.
     string.push_str(file_name.clone().to_str().unwrap());
     println!("{}", string);
-  
+    
+    if dir_entry.path().clone().to_str().unwrap().contains("include") {return;}
     let final_output_path = out_path.join("shaders.rs"); 
     if final_output_path.exists() || timestamps_differ(&path, &final_output_path) {
       // Now, we try to compile it.
@@ -68,7 +69,7 @@ fn compile_shaders() {
       shader_full_path.push_str(&file_name.to_str().unwrap());
       
       let output = format!("./target/shaders/{stem}.spirv", stem=stem.unwrap().to_str().unwrap());
-      let include_dir = "-I./shaders/include/";
+      let include_dir = "-I./shaders/";
       let status = std::process::Command::new("glslangValidator")
       .args(["-g", "-V", include_dir, "-Od", "-o", &output, &shader_full_path])
       .status()

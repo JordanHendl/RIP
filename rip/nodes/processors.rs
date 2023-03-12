@@ -25,3 +25,5 @@ pub mod color_space_conversion;
 pub use color_space_conversion::*;
 pub mod overlay;
 pub use overlay::*;
+pub mod object_highlight;
+pub use object_highlight::*;

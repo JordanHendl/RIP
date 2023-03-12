@@ -52,16 +52,32 @@ pub struct Pipeline {
   cmds: Vec<gpu::CommandList>,
   first: bool,
   should_run: Rc<RefCell<bool>>,
+  json_file: String,
+  json_configuration: String,
+  json_timestamp: Option<std::time::SystemTime>,
 }
 
 impl Pipeline {
 
   pub fn parse_json(& mut self, path: &str) {
+    self.nodes = Default::default();
+    self.execution_order = Default::default();
+    self.edges = Default::default();
+    self.images.clear();
+    self.views.clear();
+
+    self.json_file = path.to_string();
+    self.json_configuration = std::fs::read_to_string(path).expect("Unable to load json file!");
     let (nodes,
         execution,
         edges,
-        dimensions) = node_parser::parse_json(&self.interface, path);
+        dimensions) = node_parser::parse_json(&self.interface, &self.json_configuration.as_str());
     
+    let meta = std::fs::metadata(&self.json_file);
+    if let Ok(time) = meta.unwrap().modified() {
+      self.json_timestamp = Some(time);
+    }
+
     let img_info = gpu::ImageCreateInfo::builder()
     .gpu(0)
     .size(dimensions.0 as usize, dimensions.1 as usize)
@@ -86,7 +102,7 @@ impl Pipeline {
     self.nodes = nodes;
     self.execution_order = execution;
     self.edges = edges;
-
+    
     self.cmds[0].begin();
     for node_id in &self.execution_order {
       self.nodes[*node_id as usize].assign(&self.views[*node_id as usize]);
@@ -121,6 +137,9 @@ impl Pipeline {
       register: Default::default(),
       network: network::Manager::new(),
       node_name_map: Default::default(),
+      json_file: Default::default(),
+      json_configuration: Default::default(),
+      json_timestamp: Default::default(),
     };
 
     let info = gpu::CommandListCreateInfo::builder()
@@ -229,5 +248,15 @@ impl Pipeline {
 
     self.handle_network();
     self.interface.as_ref().borrow_mut().poll_events();
+
+    let meta = std::fs::metadata(&self.json_file);
+    if meta.is_ok() {
+      if let Ok(time) = meta.unwrap().modified() {
+        if *self.json_timestamp.as_ref().unwrap() != time {
+          let file = self.json_file.clone();
+          self.parse_json(file.as_str());
+        }
+      }
+    }
   }
 }

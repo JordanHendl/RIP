@@ -10,3 +10,7 @@ message ImageResponse {
   int32 num_channels = 3;
   repeated float image = 4;
 }
+
+message ConfigurationResponse {
+  string json = 1;
+}

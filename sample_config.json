@@ -1,23 +1,28 @@
 {
   "dimensions": [512, 512],
   "starters": {
-    "pattern": {
-      "mode": "circle"
+    "image_load": {
+      "path": "${SRC_DIR}/data/funny_guy.png"
     },
     "pattern_2": {
       "type": "pattern",
-      "mode": "horizontal_color_bar"
+      "mode": "horizontal_bar"
     }
   },
   "imgproc": {
-    "arithmetic": {
-      "mode": "multiply",
-      "input": ["pattern.output", "pattern_2.output"]
+    "chroma_key": {
+      "red": 93,
+      "green": 144,
+      "blue": 95,
+      "low_range": 10.0,
+      "high_range": 20.0,
+
+      "input": ["image_load.output", "pattern_2.output"]
     }
   },
   "finishers": {
     "display": {
-      "input": "arithmetic.output"
+      "input": "chroma_key.output"
     }
   }
 } 

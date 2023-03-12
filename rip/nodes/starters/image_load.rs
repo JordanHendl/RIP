@@ -17,6 +17,7 @@ struct ImageLoadData {
   image: Option<gpu::ImageView>,
   path: String,
   loaded: bool,
+  file_timestamp: Option<std::time::SystemTime>,
 }
 
 pub struct ImageLoad {
@@ -40,29 +41,13 @@ impl ImageLoad {
     self.data.loaded = false;
   } 
 
-  pub fn new(info: &NodeCreateInfo) -> Box<dyn RipNode + Send> {
-    println!("Creating node {}!", info.name);
-    let mut obj = Box::new(ImageLoad {
-      interface: info.interface.clone(),
-      data: Default::default(),
-      data_bus: Default::default(),
-      name: info.name.to_string(),
-    });
-    
-    let mut data_bus: DataBus = Default::default();
-    let name = info.name.clone();
-    data_bus.add_object_subscriber(&(name + "::path"), obj.as_mut(), ImageLoad::set_path);
+  fn load_file(& mut self) {
+    if !self.data.path.is_empty() {
 
-    obj.data_bus = data_bus;
-    return obj;
-  }
-}
+      // Sleep for a second purely to make sure the file has no active writes. this is a cludge because I can't figure out how 
+      // to make Rust wait for the file to finish writing.
+      std::thread::sleep(std::time::Duration::from_millis(1000));
 
-// Base class implementations
-impl RipNode for ImageLoad {
-  fn execute(& mut self, _cmd: & mut gpu::CommandList) {
-    println!("Executing Node {}", self.name);
-    if !self.data.path.is_empty() && !self.data.loaded {
       let res = stb_image::image::load_with_depth(&self.data.path, 4, true);
       let devices = self.interface.borrow().devices();
       let cmd_info = gpu::CommandListCreateInfo::builder()
@@ -117,8 +102,37 @@ impl RipNode for ImageLoad {
         },
       }
 
+      let meta = std::fs::metadata(&self.data.path);
+      if let Ok(time) = meta.unwrap().modified() {
+        self.data.file_timestamp = Some(time);
+      }
+
       self.data.loaded = true;
     }
+  }
+  pub fn new(info: &NodeCreateInfo) -> Box<dyn RipNode + Send> {
+    println!("Creating node {}!", info.name);
+    let mut obj = Box::new(ImageLoad {
+      interface: info.interface.clone(),
+      data: Default::default(),
+      data_bus: Default::default(),
+      name: info.name.to_string(),
+    });
+    
+    let mut data_bus: DataBus = Default::default();
+    let name = info.name.clone();
+    data_bus.add_object_subscriber(&(name + "::path"), obj.as_mut(), ImageLoad::set_path);
+
+    obj.data_bus = data_bus;
+    return obj;
+  }
+}
+
+// Base class implementations
+impl RipNode for ImageLoad {
+  fn execute(& mut self, _cmd: & mut gpu::CommandList) {
+    println!("Executing Node {}", self.name);
+    self.load_file();
   }
 
   fn input(& mut self, image: &gpu::ImageView) {
@@ -129,7 +143,17 @@ impl RipNode for ImageLoad {
     self.data.image = Some(view.clone());
   }
 
+  fn post_execute(& mut self, cmd: & mut gpu::CommandList) {
+    let meta = std::fs::metadata(&self.data.path);
 
+    if meta.is_ok() {
+      if let Ok(time) = meta.unwrap().modified() {
+        if *self.data.file_timestamp.as_ref().unwrap() != time {
+          self.load_file();
+        }
+      }
+    }
+  }
   fn name(&self) -> String {
     return self.name.clone();
   }

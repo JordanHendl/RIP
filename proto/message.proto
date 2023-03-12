@@ -3,9 +3,10 @@ import "proto/response.proto";
 
 enum RequestType {
   Image = 0;
-  Components = 1;
-  Details = 2;
-  Video = 3;
+  Configuration = 1;
+  Components = 2;
+  Details = 3;
+  Video = 4;
 }
 
 message Request {
@@ -20,5 +21,6 @@ message Response {
   oneof DetailedResponse {
     NoneResponse none_response = 3;
     ImageResponse image_response = 4;
+    ConfigurationResponse config_response = 5;
   }
 }

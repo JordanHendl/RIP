@@ -1,5 +1,5 @@
 {
-  "dimensions": [512, 512],
+  "dimensions": [128, 128],
   "starters": {
     "image_load": {
       "path": "${SRC_DIR}/data/peppers.png"

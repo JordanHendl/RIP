@@ -42,6 +42,7 @@ fn get_functors() -> HashMap<String, Callback> {
   functors.insert("chroma_key".to_string(), processors::ChromaKey::new);
   functors.insert("crop".to_string(), processors::Crop::new);
   functors.insert("overlay".to_string(), processors::Overlay::new);
+  functors.insert("object_highlight".to_string(), processors::ObjectHighlight::new);
   functors.insert("color_space_conversion".to_string(), processors::ColorSpaceConversion::new);
   functors.insert("transform".to_string(), processors::Transform::new);
   functors.insert("connected_components".to_string(), processors::ConnectedComponents::new);
@@ -188,24 +189,22 @@ fn configure_nodes(json: &JsonValue) {
   }
 }
 
-pub fn parse_json(interface: &Rc<RefCell<gpu::GPUInterface>>, path: &str) -> 
+pub fn parse_json(interface: &Rc<RefCell<gpu::GPUInterface>>, json_data: &str) -> 
 (Vec<Box<dyn RipNode + Send>>, Vec<u32>, HashMap<u32, Vec<u32>>, (u32, u32)) {
 
   let starter_functors = get_starter_functors();
   let node_functors = get_functors();
   let finisher_functors = get_finisher_functors();
 
-  let json_data = std::fs::read_to_string(path).expect("Unable to load json file!");
+  
   let mut created_nodes:  Vec<Box<dyn RipNode + Send>> = Vec::new();
 
   let mut starter_ids: HashMap<String, usize> = HashMap::new();
   let mut node_ids: HashMap<String, usize> = HashMap::new();
   let mut finisher_ids: HashMap<String, usize> = HashMap::new();
 
-
-
   println!("Loaded json file: \n{}", json_data);
-  let root = json::parse(json_data.as_str()).expect("Unable to parse JSON configuration!");
+  let root = json::parse(json_data).expect("Unable to parse JSON configuration!");
   assert!(root.has_key("starters"), "Failed to find any pipeline starters in the configuration!");
   assert!(root.has_key("finishers"), "Failed to find any pipeline finishers in the configuration!");
 

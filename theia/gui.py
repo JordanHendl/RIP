@@ -1,14 +1,16 @@
+from network import RipNetwork
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QLabel
+import json
 
 class ConnectTab(QtWidgets.QDialog):
-  def __init__(self, window):
+  def __init__(self, window, cb):
     super().__init__(window)
     self.setWindowTitle("Connect to runtime")
     self.setGeometry(0, 0, 300, 150)
     self.layout = QtWidgets.QVBoxLayout()
-
+    self.cb = cb
     self.ip_label = QtWidgets.QLabel("IP:")
     self.ip_input = QtWidgets.QLineEdit("127.0.0.1")
     self.port_label = QtWidgets.QLabel("Port:")
@@ -25,7 +27,7 @@ class ConnectTab(QtWidgets.QDialog):
     self.setLayout(self.layout)
 
   def on_click(self):
-    print("clicked!")
+    self.cb(self.ip_input.text(), self.port_input.text())
 
 class MainAreaTab(QtWidgets.QWidget):
   def __init__(self, window):
@@ -46,7 +48,8 @@ class TheiaMainWindow(QtWidgets.QMainWindow):
     self.setWindowTitle("theia")
 
     # Custom Widgets
-    self.connect_tab = ConnectTab(self)
+    self.network = RipNetwork()
+    self.connect_tab = ConnectTab(self, self.initialize_connection)
 
     # Menu widgets
     self.menu_bar = self.menuBar()
@@ -62,11 +65,16 @@ class TheiaMainWindow(QtWidgets.QMainWindow):
     self.setCentralWidget(self.central_widget)
     self.show()
 
+  def parse_json(self):
+    j = json.loads(self.json)
+
+  def initialize_connection(self, ip, port):
+    self.network.connect(ip, port)
+    self.json = self.network.get_json()
+    self.parse_json()
+
   def show_connect_tab(self):
-    print("lmao")
     self.connect_tab.show()
-
-
 
 def run(argv):
   app = QtWidgets.QApplication(argv)

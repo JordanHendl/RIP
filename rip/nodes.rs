@@ -71,8 +71,10 @@ impl Pipeline {
     let (nodes,
         execution,
         edges,
-        dimensions) = node_parser::parse_json(&self.interface, &self.json_configuration.as_str());
+        dimensions,
+        ip_port) = node_parser::parse_json(&self.interface, &self.json_configuration.as_str());
     
+    self.network.bind(&ip_port.0, &ip_port.1);
     let meta = std::fs::metadata(&self.json_file);
     if let Ok(time) = meta.unwrap().modified() {
       self.json_timestamp = Some(time);

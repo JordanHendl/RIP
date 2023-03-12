@@ -9,7 +9,6 @@ vec3 rgb2ycbcr(vec3 c) {
   return vec3(float(y) / 256.0, float(cb) / 256.0, float(cr) / 256.0);
 }
 
-
 vec3 ycbcr2rgb(vec3 c) {
   int Y = int(c.r * 256);
   int Cb = int(c.g * 256);

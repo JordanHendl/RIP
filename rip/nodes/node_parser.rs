@@ -190,15 +190,14 @@ fn configure_nodes(json: &JsonValue) {
 }
 
 pub fn parse_json(interface: &Rc<RefCell<gpu::GPUInterface>>, json_data: &str) -> 
-(Vec<Box<dyn RipNode + Send>>, Vec<u32>, HashMap<u32, Vec<u32>>, (u32, u32)) {
+(Vec<Box<dyn RipNode + Send>>, Vec<u32>, HashMap<u32, Vec<u32>>, (u32, u32), (String, String)) {
 
   let starter_functors = get_starter_functors();
   let node_functors = get_functors();
   let finisher_functors = get_finisher_functors();
 
-  
   let mut created_nodes:  Vec<Box<dyn RipNode + Send>> = Vec::new();
-
+  let mut network_info: (String, String) = ("127.0.0.1".to_string(), "5555".to_string());
   let mut starter_ids: HashMap<String, usize> = HashMap::new();
   let mut node_ids: HashMap<String, usize> = HashMap::new();
   let mut finisher_ids: HashMap<String, usize> = HashMap::new();
@@ -221,6 +220,16 @@ pub fn parse_json(interface: &Rc<RefCell<gpu::GPUInterface>>, json_data: &str) -
     ydim = dims[1].as_u32().unwrap();
   }
 
+  if root.has_key("network") {
+    let network = &root["network"];
+    if network.has_key("ip") {
+      network_info.0 = network["ip"].as_str().unwrap().to_string().clone();
+    }
+
+    if network.has_key("port") {
+      network_info.1 = network["port"].as_str().unwrap().to_string().clone();
+    }
+  }
   let node_handler = |node: (&str, &JsonValue), functors: &HashMap<String, Callback>| {
     let name = node.0;
     let type_name = if node.1.has_key("type") {node.1["type"].as_str()} else {Some(node.0)}.unwrap();
@@ -281,5 +290,5 @@ pub fn parse_json(interface: &Rc<RefCell<gpu::GPUInterface>>, json_data: &str) -
     &finishers);
 
 
-  return (created_nodes, execution_order, connections, (xdim, ydim));
+  return (created_nodes, execution_order, connections, (xdim, ydim), network_info);
 }

@@ -11,12 +11,21 @@ impl Manager {
   pub fn new() -> Self {
     let ctx = zmq::Context::new();
     let socket = ctx.socket(zmq::REP).unwrap();
-    socket.bind("tcp://127.0.0.1:5555").expect("Failed to bind to ZMQ Port!");
-
     return Manager { 
       ctx: ctx,
       socket: socket,
     };
+  }
+
+  pub fn bind(& mut self, ip: &String, port: &String) {
+
+    let mut str = "tcp://".to_string();
+    str.push_str(ip);
+    str.push_str(":");
+    str.push_str(port);
+
+    println!("rip-- binding to ip {} and port {}", ip, port);
+    self.socket.bind(&str.as_str()).expect("Failed to bind to ZMQ Port!");
   }
 
   pub fn receive_message(& mut self) -> Option<zmq::Message> {

@@ -3,7 +3,7 @@ import zmq
 from matplotlib import pyplot as plt
 import numpy
 
-def main(): 
+def test_app(): 
   port = "5555"
   ctx = zmq.Context()
   socket = ctx.socket(zmq.REQ)
@@ -37,5 +37,11 @@ def main():
                                      pb_response.image_response.num_channels))
       plt.imshow(reshaped)
       plt.show()
+
+import gui 
+import sys
+def main():
+  gui.run(sys.argv)
+
 if __name__ == "__main__":
   main()

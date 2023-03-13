@@ -1,12 +1,11 @@
 syntax = "proto3";
-import "proto/response.proto";
+import "response.proto";
 
 enum RequestType {
   Image = 0;
   Configuration = 1;
   Components = 2;
   Details = 3;
-  Video = 4;
 }
 
 message Request {

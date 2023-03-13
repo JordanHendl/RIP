@@ -32,7 +32,7 @@ fn timestamps_differ(first: &Path, second: &Path) -> bool {
 }
 
 fn compile_protobuf() {
-  let path = env!("CARGO_MANIFEST_DIR");
+  let path = concat!(env!("CARGO_MANIFEST_DIR"), "/proto/");
   println!("cargo:rerun-if-changed=response.proto");
   println!("cargo:rerun-if-changed=message.proto");
   protobuf_codegen::Codegen::new()

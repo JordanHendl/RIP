@@ -210,6 +210,12 @@ impl Pipeline {
             },
             None => todo!(),
         }
+      } else if r.request_type == message::RequestType::Configuration.into() {
+        let mut response = message::Response::new();
+        let mut config_response = response::ConfigurationResponse::new();
+        config_response.json = self.json_configuration.clone();
+        response.set_config_response(config_response);
+        self.network.send_response(response);
       } else {
         let name = r.node_name.clone();
         let node_id = self.node_name_map.get(&name);

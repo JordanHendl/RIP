@@ -130,8 +130,6 @@ class TheiaMainWindow(QtWidgets.QMainWindow):
                                      width,
                                      4))
       
-      plt.imshow(reshaped)
-      plt.show()
       self.central_widget.update_image(width, height, reshaped)
 
   def show_connect_tab(self):
